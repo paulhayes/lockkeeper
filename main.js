@@ -24,6 +24,7 @@ var settings = {
     httpAdminRoot:"/admin",
     httpNodeRoot: "/",
     userDir: __dirname,
+    flowFile: "flows.json",
     functionGlobalContext: { }    // enables global context
 };
 
