@@ -1,7 +1,7 @@
 {
-  "name": "electron-quick-start",
+  "name": "electron-node-red",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Electron Node-RED template",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js"
