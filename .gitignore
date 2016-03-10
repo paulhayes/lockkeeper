@@ -28,3 +28,5 @@ node_modules
 .config.json
 .flows.json.backup
 .sessions.json
+*darwin-x64*
+*win32-x64*
