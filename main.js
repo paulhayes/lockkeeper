@@ -57,10 +57,12 @@ function createWindow () {
   	height: 768
   });
 
-  // and load the index.html of the app.
-  //mainWindow.loadURL("http://google.ca");
   mainWindow.loadURL("http://localhost:8000/ui");
-  //mainWindow.loadURL('file://' + __dirname + '/index.html');
+  var webContents = mainWindow.webContents;
+  webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
+    if (httpResponseCode == 404)
+      setTimeout(webContents.reload, 200);
+  });
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
