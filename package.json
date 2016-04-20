@@ -1,6 +1,6 @@
 {
   "name": "electron-node-red",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Electron Node-RED template",
   "main": "main.js",
   "scripts": {
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atom/electron-quick-start.git"
+    "url": "git+https://github.com/natcl/electron-node-red.git"
   },
   "dependencies": {
-    "node-red": "0.13.3",
-    "node-red-contrib-ui": "1.2.19",
-    "express": "4.13.3"
+    "node-red": "~0.13.4",
+    "node-red-contrib-ui": "^1.2.19",
+    "express": "^4.13.0"
   },
   "keywords": [
     "Electron",
@@ -21,13 +21,13 @@
     "start",
     "tutorial"
   ],
-  "author": "GitHub",
+  "author": "Nathanaël Lécaudé",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/atom/electron-quick-start/issues"
+    "url": "https://github.com/natcl/electron-node-red/issues"
   },
-  "homepage": "https://github.com/atom/electron-quick-start#readme",
+  "homepage": "https://github.com/natcl/electron-node-red#readme",
   "devDependencies": {
-    "electron-prebuilt": "^0.36.0"
+    "electron-prebuilt": "^0.37.0"
   }
 }
