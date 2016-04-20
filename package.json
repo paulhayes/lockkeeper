@@ -1,6 +1,6 @@
 {
   "name": "electron-node-red",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Electron Node-RED template",
   "main": "main.js",
   "scripts": {
