@@ -19,7 +19,8 @@
     "Electron",
     "quick",
     "start",
-    "tutorial"
+    "tutorial",
+    "node-red"
   ],
   "author": "Nathanaël Lécaudé",
   "license": "CC0-1.0",
