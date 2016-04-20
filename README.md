@@ -24,13 +24,13 @@ If you want to distribute executables of this project, the easiest way is to use
 ```
 sudo npm install -g electron-packager
 
-# build fox OS X 64 bits
+# build for OS X 64 bits
 electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=darwin --arch=x64
 
-# build fox Windows 64 bits
+# build for Windows 64 bits
 electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=win32 --arch=x64
 
-# build fox Linux 64 bits
+# build for Linux 64 bits
 electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=linux --arch=x64
 ```
 
