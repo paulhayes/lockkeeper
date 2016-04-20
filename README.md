@@ -25,13 +25,13 @@ If you want to distribute executables of this project, the easiest way is to use
 sudo npm install -g electron-packager
 
 # build fox OS X 64 bits
-electron-packager electron-node-red MyAppName --platform=darwin --arch=x64
+electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=darwin --arch=x64
 
 # build fox Windows 64 bits
-electron-packager electron-node-red MyAppName --platform=win32 --arch=x64
+electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=win32 --arch=x64
 
-# build fox OS X 64 bits
-electron-packager electron-node-red MyAppName --platform=linux --arch=x64
+# build fox Linux 64 bits
+electron-packager electron-node-red MyAppName --icon=nodered.icns --platform=linux --arch=x64
 ```
 
 Learn more about Electron and its API in the [documentation](http://electron.atom.io/docs/latest).
