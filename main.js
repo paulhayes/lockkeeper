@@ -6,6 +6,7 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+var Menu = require("menu");
 var http = require('http');
 var express = require("express");
 var RED = require("node-red");
@@ -54,14 +55,16 @@ function createWindow () {
       nodeIntegration: false
     },
   	width: 1024,
-  	height: 768
+  	height: 768,
+    icon: __dirname + "/nodered.png"
   });
 
   mainWindow.loadURL("http://localhost:8000/ui");
   var webContents = mainWindow.webContents;
   webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
-    if (httpResponseCode == 404)
+    if (httpResponseCode == 404) {
       setTimeout(webContents.reload, 200);
+  }
   });
 
   // Open the DevTools.
@@ -95,4 +98,27 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow();
   }
+
+  // Create the Application's main menu
+  var template = [{
+      label: "Application",
+      submenu: [
+          { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+          { type: "separator" },
+          { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+      ]}, {
+      label: "Edit",
+      submenu: [
+          { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+          { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+          { type: "separator" },
+          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+      ]}
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+
 });
