@@ -8,14 +8,16 @@
     "test": "echo \" Warning: no test specified \"",
 
     "clean": "rm -rf ./dist ",
-    "clean: osx": "rm -rf ./dist/osx",
-    "clean: win": "rm -rf ./dist/win",
 
-    "pack": "npm run pack : osx",
-    "pack: osx": "npm run clean:. osx && electron-packager electron-node-red Node-RED --out = dist/osx --icon=nodered.icns --platform=darwin --arch=x64 ",
+    "pack": "npm run pack:osx",
+    "pack:osx": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
+    "pack:win": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
 
-    "build": "npm run build : osx",
-    "build: osx": "npm run pack: osx && appdmg appdmg.json dist/NodeRED.dmg"
+    "build": "npm run build:osx",
+    "build:osx": "npm run pack:osx && appdmg appdmg.json dist/Node-RED.dmg",
+    "build:mac": "npm run pack:osx && electron-builder \"dist/Node-RED-darwin-x64\" --platform=osx --out=dist --config=builder.json",
+    "build:win": "npm run pack:win && electron-builder \"dist/Node-RED-win32-x64\" --platform=win --out=dist --config=builder.json"
+
    },
   "repository": {
     "type": "git",
