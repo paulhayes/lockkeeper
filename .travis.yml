@@ -1,4 +1,4 @@
-# Actually to use the Node, to move in the OS X environment by specifying the Objective-C
+# Use OSX as env to build in
  language: objective-c
  cache:
    directories:
@@ -6,16 +6,6 @@
  env:
    # Node in order to install it by running the command individually, here to specify the version
    - NODE_VERSION="4.4"
-before_deploy:
-      # Brew is the latest state
-      - brew update
-      # Wine for build to the Windows environment is required
-      - brew install wine
-      - wine --version
-      # Makensis for creating Windows Installer is required
-      - brew install makensis
-      # Perform to build + installer created + zip with respect to each platform
-      # - npm run build
  before_install:
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
    - git clone https://github.com/creationix/nvm.git /tmp/.nvm
@@ -30,3 +20,13 @@ before_deploy:
    - npm install
  script:
    - npm run build
+ before_deploy:
+   # Brew is the latest state
+   - brew update
+   # Wine for build to the Windows environment is required
+   - brew install wine
+   - wine --version
+   # Makensis for creating Windows Installer is required
+   - brew install makensis
+   # Perform to build + installer created + zip with respect to each platform
+   # - npm run build

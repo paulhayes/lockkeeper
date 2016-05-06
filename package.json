@@ -14,7 +14,7 @@
         "pack:win": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
 
         "build": "npm run build:osx",
-        "build:osx": "npm run pack:osx && appdmg appdmg.json dist/Node-RED.dmg"
+        "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg"
     },
     "repository": {
         "type": "git",
