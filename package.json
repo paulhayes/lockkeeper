@@ -9,9 +9,9 @@
 
         "clean": "rm -rf ./dist ",
 
-        "pack": "npm run pack:osx",
-        "pack:osx": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
-        "pack:win": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
+        "pack": "npm run clean && npm run pack:osx && npm run pack:win",
+        "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
+        "pack:win": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
 
         "build": "npm run build:osx",
         "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg"
