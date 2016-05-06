@@ -18,7 +18,7 @@
  install:
    - npm install
  script:
-   - npm test
+   - npm run build
  before_deploy:
    # Brew is the latest state
    - brew update
@@ -28,4 +28,4 @@
    # Makensis for creating Windows Installer is required
    - brew install makensis
    # Perform to build + installer created + zip with respect to each platform
-   - npm run build
+   # - npm run build

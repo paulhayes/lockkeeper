@@ -1,52 +1,49 @@
 {
-  "name": "electron-node-red",
-  "version": "1.0.5",
-  "description": "Electron Node-RED template",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron main.js",
-    "test": "echo \" Warning: no test specified \"",
+    "name": "electron-node-red",
+    "version": "1.0.5",
+    "description": "Electron Node-RED application starter",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron main.js",
+        "test": "echo \" Warning: no test specified \"",
 
-    "clean": "rm -rf ./dist ",
+        "clean": "rm -rf ./dist ",
 
-    "pack": "npm run pack:osx",
-    "pack:osx": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
-    "pack:win": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
+        "pack": "npm run pack:osx",
+        "pack:osx": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
+        "pack:win": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
 
-    "build": "npm run build:osx",
-    "build:osx": "npm run pack:osx && appdmg appdmg.json dist/Node-RED.dmg",
-    "build:mac": "npm run pack:osx && electron-builder \"dist/Node-RED-darwin-x64\" --platform=osx --out=dist --config=builder.json",
-    "build:win": "npm run pack:win && electron-builder \"dist/Node-RED-win32-x64\" --platform=win --out=dist --config=builder.json"
-
-   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/natcl/electron-node-red.git"
-  },
-  "dependencies": {
-    "node-red": "~0.13.4",
-    "node-red-dashboard": "git+https://github.com/node-red/node-red-dashboard.git",
-    "express": "^4.13.0"
-  },
-  "keywords": [
-    "electron",
-    "quick",
-    "start",
-    "node-red"
-  ],
-  "contributors": [
-      {"name":"Nathanaël Lécaudé"},
-      {"name":"Dave Conway-Jones"}
-  ],
-  "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/dceejay/electron-node-red/issues"
-  },
-  "homepage": "https://github.com/dceejay/electron-node-red#readme",
-  "devDependencies": {
-    "electron-prebuilt": "^0.37.8",
-    "electron-builder": "*",
-    "appdmg": "*",
-    "electron-packager": "*"
-  }
+        "build": "npm run build:osx",
+        "build:osx": "npm run pack:osx && appdmg appdmg.json dist/Node-RED.dmg"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dceejay/electron-node-red.git"
+    },
+    "dependencies": {
+        "node-red": "~0.13.4",
+        "node-red-dashboard": "git+https://github.com/node-red/node-red-dashboard.git",
+        "node-red-contrib-web-worldmap": "*",
+        "express": "^4.13.0"
+    },
+    "keywords": [
+        "electron",
+        "quick",
+        "start",
+        "node-red"
+    ],
+    "contributors": [
+        {"name":"Dave Conway-Jones"},
+        {"name":"Nathanaël Lécaudé"}
+    ],
+    "license": "CC0-1.0",
+    "bugs": {
+        "url": "https://github.com/dceejay/electron-node-red/issues"
+    },
+    "homepage": "https://github.com/dceejay/electron-node-red#readme",
+    "devDependencies": {
+        "electron-prebuilt": "^0.37.8",
+        "appdmg": "*",
+        "electron-packager": "*"
+    }
 }
