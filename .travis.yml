@@ -5,15 +5,15 @@
      - Node_modules
  env:
    # Node in order to install it by running the command individually, here to specify the version
-   - NODE_VERSION = "4.*"
+   - NODE_VERSION = "4.4"
  before_install:
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
    - git clone https://github.com/creationix/nvm.git /tmp/.nvm
    - source /tmp/.nvm/nvm.sh
    # To install the Node of the specified version
-   - nvm install $NODE_VERSION
+   - nvm install 4.4
    # To enable the Node of the specified version
-   - nvm use --delete-prefix $NODE_VERSION
+   - nvm use --delete-prefix 4.4
    - node --version
  install:
    - npm install
