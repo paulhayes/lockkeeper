@@ -4,8 +4,20 @@
   "description": "Electron Node-RED template",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js"
-  },
+    "start": "electron main.js",
+    "test": "echo \" Warning: no test specified \"",
+
+    "clean": "rm -rf ./dist ",
+    "clean: osx": "rm -rf ./dist/osx",
+    "clean: win": "rm -rf ./dist/win",
+
+    "pack": "npm run pack : osx",
+    "pack: osx": "npm run clean:. osx && electron-packager electron-node-red Node-RED --out = dist/osx --icon=nodered.icns --platform=darwin --arch=x64 ",
+
+    "build": "npm run build : osx",
+    "build: osx": "npm run pack: osx && appdmg appdmg.json dist/NodeRED.dmg",
+
+   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/natcl/electron-node-red.git"
@@ -21,13 +33,19 @@
     "start",
     "node-red"
   ],
-  "author": "Nathanaël Lécaudé",
+  "contributors": [
+      {"name":"Nathanaël Lécaudé"},
+      {"name":"Dave Conway-Jones"}
+  ],
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/natcl/electron-node-red/issues"
+    "url": "https://github.com/dceejay/electron-node-red/issues"
   },
-  "homepage": "https://github.com/natcl/electron-node-red#readme",
+  "homepage": "https://github.com/dceejay/electron-node-red#readme",
   "devDependencies": {
-    "electron-prebuilt": "^0.37.8"
+    "electron-prebuilt": "^0.37.8",
+    "electron-builder": "^2.5.0",
+    "appdmg": "*",
+    "electron-packager": "^5.2.0",
   }
 }

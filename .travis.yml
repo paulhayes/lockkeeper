@@ -1,0 +1,31 @@
+# Actually to use the Node, to move in the OS X environment by specifying the Objective-C
+ language: objective-c
+ cache:
+   directories:
+     - Node_modules
+ env:
+   # Node in order to install it by running the command individually, here to specify the version
+   - NODE_VERSION = "4.4"
+ before_install:
+   # Install the nvm.  Nvm is not included by default in OS X environment of Travis
+   - Git clone https://github.com/creationix/nvm.git /tmp/.nvm
+   - Source /tmp/.nvm/nvm.sh
+   # To install the Node of the specified version
+   - Nvm install $ NODE_VERSION
+   # To enable the Node of the specified version
+   - Nvm use --delete-prefix $ NODE_VERSION
+   - Node --version
+ install:
+   - Npm install
+ script:
+   - Npm test
+ before_deploy:
+   # Brew is the latest state
+   - Brew update
+   Wine for # build to the Windows environment is required
+   - Brew install wine
+   - Wine --version
+   # Makensis for creating Windows Installer is required
+   - Brew install makensis
+   # Perform to build + installer created + zip with respect to each platform
+   - Npm run build
