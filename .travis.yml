@@ -22,7 +22,7 @@
  before_deploy:
    # Brew is the latest state
    - Brew update
-   Wine for # build to the Windows environment is required
+   # Wine for build to the Windows environment is required
    - Brew install wine
    - Wine --version
    # Makensis for creating Windows Installer is required
