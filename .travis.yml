@@ -5,28 +5,28 @@
      - Node_modules
  env:
    # Node in order to install it by running the command individually, here to specify the version
-   - NODE_VERSION = "4.4"
+   - NODE_VERSION="4.4"
+before_deploy:
+      # Brew is the latest state
+      - brew update
+      # Wine for build to the Windows environment is required
+      - brew install wine
+      - wine --version
+      # Makensis for creating Windows Installer is required
+      - brew install makensis
+      # Perform to build + installer created + zip with respect to each platform
+      # - npm run build
  before_install:
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
    - git clone https://github.com/creationix/nvm.git /tmp/.nvm
    - source /tmp/.nvm/nvm.sh
-   # To install the Node of the specified version
    - nvm install 4.4
-   # To enable the Node of the specified version
    - nvm use --delete-prefix 4.4
    - node --version
-   - npm install -g electron-packager appdmg
+   - npm -v
+   - npm install -g electron-packager
+   - npm install -g appdmg
  install:
    - npm install
  script:
    - npm run build
- before_deploy:
-   # Brew is the latest state
-   - brew update
-   # Wine for build to the Windows environment is required
-   - brew install wine
-   - wine --version
-   # Makensis for creating Windows Installer is required
-   - brew install makensis
-   # Perform to build + installer created + zip with respect to each platform
-   # - npm run build
