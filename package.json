@@ -1,6 +1,6 @@
 {
   "name": "electron-node-red",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Electron Node-RED template",
   "main": "main.js",
   "scripts": {
@@ -12,14 +12,13 @@
   },
   "dependencies": {
     "node-red": "~0.13.4",
-    "node-red-contrib-ui": "^1.2.19",
+    "node-red-dashboard": "git+https://github.com/node-red/node-red-dashboard.git",
     "express": "^4.13.0"
   },
   "keywords": [
-    "Electron",
+    "electron",
     "quick",
     "start",
-    "tutorial",
     "node-red"
   ],
   "author": "Nathanaël Lécaudé",
@@ -29,6 +28,6 @@
   },
   "homepage": "https://github.com/natcl/electron-node-red#readme",
   "devDependencies": {
-    "electron-prebuilt": "^0.37.0"
+    "electron-prebuilt": "^0.37.8"
   }
 }
