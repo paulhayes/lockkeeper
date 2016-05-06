@@ -15,8 +15,7 @@
     "pack: osx": "npm run clean:. osx && electron-packager electron-node-red Node-RED --out = dist/osx --icon=nodered.icns --platform=darwin --arch=x64 ",
 
     "build": "npm run build : osx",
-    "build: osx": "npm run pack: osx && appdmg appdmg.json dist/NodeRED.dmg",
-
+    "build: osx": "npm run pack: osx && appdmg appdmg.json dist/NodeRED.dmg"
    },
   "repository": {
     "type": "git",
@@ -44,8 +43,8 @@
   "homepage": "https://github.com/dceejay/electron-node-red#readme",
   "devDependencies": {
     "electron-prebuilt": "^0.37.8",
-    "electron-builder": "^2.5.0",
+    "electron-builder": "*",
     "appdmg": "*",
-    "electron-packager": "^5.2.0",
+    "electron-packager": "*"
   }
 }
