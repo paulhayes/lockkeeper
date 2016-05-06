@@ -15,6 +15,7 @@
    # To enable the Node of the specified version
    - nvm use --delete-prefix 4.4
    - node --version
+   - npm install -g electron-packager appdmg
  install:
    - npm install
  script:

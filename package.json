@@ -42,8 +42,6 @@
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron-prebuilt": "^0.37.8",
-        "appdmg": "*",
-        "electron-packager": "*"
+        "electron-prebuilt": "^0.37.8"
     }
 }
