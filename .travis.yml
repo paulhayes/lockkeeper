@@ -8,24 +8,24 @@
    - NODE_VERSION = "4.4"
  before_install:
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
-   - Git clone https://github.com/creationix/nvm.git /tmp/.nvm
-   - Source /tmp/.nvm/nvm.sh
+   - git clone https://github.com/creationix/nvm.git /tmp/.nvm
+   - source /tmp/.nvm/nvm.sh
    # To install the Node of the specified version
-   - Nvm install $ NODE_VERSION
+   - nvm install $ NODE_VERSION
    # To enable the Node of the specified version
-   - Nvm use --delete-prefix $ NODE_VERSION
-   - Node --version
+   - nvm use --delete-prefix $ NODE_VERSION
+   - node --version
  install:
-   - Npm install
+   - npm install
  script:
-   - Npm test
+   - npm test
  before_deploy:
    # Brew is the latest state
-   - Brew update
+   - brew update
    # Wine for build to the Windows environment is required
-   - Brew install wine
-   - Wine --version
+   - brew install wine
+   - wine --version
    # Makensis for creating Windows Installer is required
-   - Brew install makensis
+   - brew install makensis
    # Perform to build + installer created + zip with respect to each platform
-   - Npm run build
+   - npm run build
