@@ -13,8 +13,7 @@
    # To install the Node of the specified version
    - nvm install 4.4
    # To enable the Node of the specified version
-   # nvm use --delete-prefix 4.4
-   - nvm use 4.4
+   - nvm use --delete-prefix 4.4
    - node --version
  install:
    - npm install
