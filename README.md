@@ -43,6 +43,15 @@ look at `https://github.com/LinusU/node-appdmg`
 
     appdmg appdmg.json ~/Desktop/NodeRED.dmg
 
+
+### To package as a deb
+
+look at `https://github.com/jordansissel/fpm`
+
+    fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m your-email@example.com -a i386 Node-RED-linux-ia32/
+    fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
+
+
 #### License [CC0 (Public Domain)](LICENSE.md)
 
 ## See also

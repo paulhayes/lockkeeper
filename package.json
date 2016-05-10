@@ -9,13 +9,17 @@
 
         "clean": "rm -rf ./dist ",
 
-        "pack": "npm run clean && npm run pack:osx && npm run pack:win",
+        "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=dist",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
         "pack:win": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
         "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=dist",
+        "pack:linux": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=dist",
+        "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=dist",
 
         "build": "npm run build:osx",
-        "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg"
+        "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg",
+        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m conway@uk.ibm.com -a i386 -p dist dist/Node-RED-linux-ia32/",
+        "build:linux": "npm run pack:linux && fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m conway@uk.ibm.com -a x86_64 -p dist dist/Node-RED-linux-x64/"
     },
     "repository": {
         "type": "git",

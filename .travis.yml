@@ -2,17 +2,15 @@
  language: objective-c
  cache:
    directories:
-     - Node_modules
+     - node_modules
  env:
    # Node in order to install it by running the command individually, here to specify the version
-   - NODE_VERSION="4.4"
+   #- NODE_VERSION="4.4"
  before_install:
-   # Brew is the latest state
+   # Install brew -> wine and makensis
    - brew update
-   # Wine for build to the Windows environment is required
    - brew install wine
    - wine --version
-   # Makensis for creating Windows Installer is required
    - brew install makensis
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
    - git clone https://github.com/creationix/nvm.git /tmp/.nvm
@@ -27,5 +25,5 @@
    - npm install
  script:
    - npm run build
- deploy:
-   skip_cleanup: true
+ #deploy:
+ #  skip_cleanup: true
