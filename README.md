@@ -44,3 +44,7 @@ look at `https://github.com/LinusU/node-appdmg`
     appdmg appdmg.json ~/Desktop/NodeRED.dmg
 
 #### License [CC0 (Public Domain)](LICENSE.md)
+
+## See also
+ - **Stand-alone Starter Project** - https://github.com/dceejay/node-red-project-starter
+ - **Bluemix Starter Project** - https://github.com/dceejay/node-red-bluemix-starter
