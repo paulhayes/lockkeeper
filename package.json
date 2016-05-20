@@ -26,9 +26,12 @@
         "url": "git+https://github.com/dceejay/electron-node-red.git"
     },
     "dependencies": {
-        "node-red": "~0.13.4",
-        "node-red-dashboard": "git+https://github.com/node-red/node-red-dashboard.git",
-        "node-red-contrib-web-worldmap": "*",
+        "node-red": "^0.13.4",
+        "node-red-dashboard": "node-red/node-red-dashboard",
+        "node-red-contrib-web-worldmap": "^1.0.0",
+        "node-red-node-geofence": "*",
+        "node-red-node-disco": "./node-red-node-disco-0.0.1.tgz",
+        "node-red-node-sensortag": "*",
         "express": "^4.13.0"
     },
     "keywords": [

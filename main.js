@@ -23,6 +23,7 @@ var server = http.createServer(red_app);
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
+    verbose: true,
     httpAdminRoot:"/admin",
     httpNodeRoot: "/",
     userDir: __dirname,
