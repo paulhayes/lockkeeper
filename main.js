@@ -7,7 +7,8 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
-var Menu = require("menu");
+const {Menu, MenuItem} = electron;
+
 var http = require('http');
 var express = require("express");
 var RED = require("node-red");
