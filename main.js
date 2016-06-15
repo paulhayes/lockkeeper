@@ -78,6 +78,8 @@ function createWindow () {
             nodeIntegration: false
         },
         title: "Node-RED",
+        fullscreenable: true,
+        //titleBarStyle: "hidden",
         width: 1024,
         height: 768,
         icon: __dirname + "/nodered.png"
