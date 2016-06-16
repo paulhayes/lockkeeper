@@ -9,6 +9,7 @@
  before_install:
    # Install brew -> wine and makensis
    - brew update
+   - brew install libusb
    - brew install wine
    - wine --version
    - brew install makensis
