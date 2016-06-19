@@ -6,6 +6,8 @@ const electron = require('electron');
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
+// Start directly on the ui page
+const url = "http://localhost:8000/ui";
 
 const {Menu, MenuItem} = electron;
 
@@ -84,15 +86,17 @@ function createWindow () {
         height: 768,
         icon: __dirname + "/nodered.png"
     });
-    mainWindow.loadURL("http://localhost:8000/ui");
 
     var webContents = mainWindow.webContents;
     webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
-        if ((httpResponseCode == 404) && (newURL == "http://localhost:8000/ui")) {
-            setTimeout(webContents.reload, 200);
+        if ((httpResponseCode == 404) && (newURL == url)) {
+            setTimeout(webContents.reload, 250);
         }
         Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     });
+
+    // load the initial page
+    setTimeout(function() {mainWindow.loadURL(url)}, 250);
 
     // Open the DevTools.
     //mainWindow.webContents.openDevTools();
