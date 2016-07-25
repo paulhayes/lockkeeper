@@ -26,11 +26,10 @@
         "url": "git+https://github.com/dceejay/electron-node-red.git"
     },
     "dependencies": {
-        "node-red": "^0.14.4",
-        "node-red-dashboard": "2.*",
+        "node-red": "^0.14.5",
+        "node-red-dashboard": "^2.0.0",
         "node-red-contrib-web-worldmap": "^1.0.13",
         "node-red-node-geofence": "*",
-        "node-red-node-disco": "./node-red-node-disco-0.0.1.tgz",
         "express": "^4.14.0"
     },
     "keywords": [
