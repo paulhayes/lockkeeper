@@ -30,6 +30,8 @@
         "node-red-dashboard": "^2.0.0",
         "node-red-contrib-web-worldmap": "^1.0.13",
         "node-red-node-geofence": "*",
+        "node-red-node-random": "*",
+        "node-red-node-smooth": "*",
         "express": "^4.14.0"
     },
     "keywords": [
