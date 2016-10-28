@@ -96,7 +96,7 @@ function createWindow () {
     });
 
     // load the initial page
-    setTimeout(function() {mainWindow.loadURL(url)}, 500);
+    setTimeout(function() {mainWindow.loadURL(url)}, 1000);
 
     // Open the DevTools.
     //mainWindow.webContents.openDevTools();
