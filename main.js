@@ -43,10 +43,6 @@ red_app.use(settings.httpAdminRoot,RED.httpAdmin);
 // Serve the http nodes UI from /api
 red_app.use(settings.httpNodeRoot,RED.httpNode);
 
-server.listen(8000);
-
-// Start the runtime
-RED.start();
 
 // Create the Application's main menu
 var template = [{
@@ -90,13 +86,10 @@ function createWindow () {
     var webContents = mainWindow.webContents;
     webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
         if ((httpResponseCode == 404) && (newURL == url)) {
-            setTimeout(webContents.reload, 250);
+            setTimeout(webContents.reload, 200);
         }
         Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     });
-
-    // load the initial page
-    setTimeout(function() {mainWindow.loadURL(url)}, 1000);
 
     // Open the DevTools.
     //mainWindow.webContents.openDevTools();
@@ -122,8 +115,7 @@ function createWindow () {
     });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
+// Called when Electron has finished initialization and is ready to create browser windows.
 app.on('ready', createWindow);
 
 // Quit when all windows are closed.
@@ -141,4 +133,11 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow();
     }
+});
+
+// Start the Node-RED runtime, then load the inital page
+RED.start().then(function() {
+    server.listen(8000,function() {
+        mainWindow.loadURL(url);
+    });
 });

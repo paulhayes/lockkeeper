@@ -14,7 +14,7 @@ git clone https://github.com/dceejay/electron-node-red.git
 # Go into the repository
 cd electron-node-red
 # Install dependencies and run the app
-npm install && npm start
+npm install && npm run clean && npm start
 ```
 
 ## TLDR
