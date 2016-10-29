@@ -17,11 +17,11 @@ cd electron-node-red
 npm install && npm run clean && npm start
 ```
 
-## TLDR
+## TL:DR
 
-Then run `npm run pack` to create packages for all platforms
-or `npm run build`  to build a .dmg file for OSX and deb files for linux (32 and 64bit).
-or `npm run build:osx` to just build for osx.
+Run `npm run pack` to create packages for all platforms
+or `npm run build`  to build a .dmg file for OSX, and deb files for linux (32 and 64bit).
+or `npm run build:osx` to just build for OSX.
 
 Builds are created in the `build` directory. Runtimes are created in the `dist` directory.
 

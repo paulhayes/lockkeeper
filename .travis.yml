@@ -5,7 +5,7 @@
      - node_modules
  env:
    # Node in order to install it by running the command individually, here to specify the version
-   #- NODE_VERSION="4.4"
+   #- NODE_VERSION="4.6"
  before_install:
    # Install brew -> wine and makensis
    - brew update
@@ -16,8 +16,8 @@
    # Install the nvm.  Nvm is not included by default in OS X environment of Travis
    - git clone https://github.com/creationix/nvm.git /tmp/.nvm
    - source /tmp/.nvm/nvm.sh
-   - nvm install 4.4
-   - nvm use --delete-prefix 4.4
+   - nvm install 4.6
+   - nvm use --delete-prefix 4.6
    - node --version
    - npm -v
    - npm install -g electron-packager
