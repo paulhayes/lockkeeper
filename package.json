@@ -7,19 +7,21 @@
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
 
-        "clean": "rm -rf ./dist ",
+        "clean": "rm -rf ./dist ./build && mkdir -p ./dist",
 
-        "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=dist",
-        "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=dist",
-        "pack:win": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=dist",
-        "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=dist",
-        "pack:linux": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=dist",
-        "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=dist",
+        "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build",
+        "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build",
+        "pack:win": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64 --out=build",
+        "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=build",
+        "pack:linux": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build",
+        "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build",
+        "pack:armv7l": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=armv7l --out=build",
 
-        "build": "npm run build:osx",
+        "build": "npm run build:osx && npm run build:linux && npm run build:linux32",
         "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg",
-        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m conway@uk.ibm.com -a i386 -p dist dist/Node-RED-linux-ia32/",
-        "build:linux": "npm run pack:linux && fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m conway@uk.ibm.com -a x86_64 -p dist dist/Node-RED-linux-x64/"
+        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a i386 -p dist build/Node-RED-linux-ia32/",
+        "build:linux": "npm run pack:linux && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a x86_64 -p dist build/Node-RED-linux-x64/",
+        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a armv7l -p dist build/Node-RED-linux-armv7l/"
     },
     "repository": {
         "type": "git",

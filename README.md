@@ -10,12 +10,20 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-git clone https://github.com/natcl/electron-node-red.git
+git clone https://github.com/dceejay/electron-node-red.git
 # Go into the repository
 cd electron-node-red
 # Install dependencies and run the app
 npm install && npm start
 ```
+
+## TLDR
+
+Then run `npm run pack` to create packages for all platforms
+or `npm run build`  to build a .dmg file for OSX and deb files for linux (32 and 64bit).
+or `npm run build:osx` to just build for osx.
+
+Builds are created in the `build` directory. Runtimes are created in the `dist` directory.
 
 ## Packaging your application
 
@@ -25,13 +33,13 @@ If you want to distribute executables of this project, the easiest way is to use
 sudo npm install -g electron-packager
 
 # build for OS X 64 bits
-electron-packager electron-node-red Node-RED --icon=nodered.icns --platform=darwin --arch=x64
+electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64
 
 # build for Windows 64 bits
-electron-packager electron-node-red Node-RED --icon=nodered.icns --platform=win32 --arch=x64
+electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64
 
 # build for Linux 64 bits
-electron-packager electron-node-red Node-RED --icon=nodered.icns --platform=linux --arch=x64
+electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64
 ```
 
 Learn more about Electron and its API in the [documentation](http://electron.atom.io/docs/latest).
@@ -41,6 +49,8 @@ Learn more about Electron and its API in the [documentation](http://electron.ato
 
 look at `https://github.com/LinusU/node-appdmg`
 
+    sudo npm install -g appdmg
+
     appdmg appdmg.json ~/Desktop/NodeRED.dmg
 
 
@@ -48,8 +58,8 @@ look at `https://github.com/LinusU/node-appdmg`
 
 look at `https://github.com/jordansissel/fpm`
 
-    fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m your-email@example.com -a i386 Node-RED-linux-ia32/
-    fpm -s dir -t deb -f -n node-red-electron -v 0.13.4 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
+    fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a i386 Node-RED-linux-ia32/
+    fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
 
 
 #### License [CC0 (Public Domain)](LICENSE.md)
