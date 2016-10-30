@@ -32,20 +32,22 @@ If you want to distribute executables of this project, the easiest way is to use
 ```
 sudo npm install -g electron-packager
 
-# build for OS X 64 bits
-electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64
+# build for OSX 64 bits
+electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite
 
 # build for Windows 64 bits
-electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64
+electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'
 
 # build for Linux 64 bits
-electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64
+electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite
 ```
 
 Learn more about Electron and its API in the [documentation](http://electron.atom.io/docs/latest).
 
 
 ### To package as a dmg
+
+`npm run build:osx`
 
 look at `https://github.com/LinusU/node-appdmg`
 
@@ -56,13 +58,23 @@ look at `https://github.com/LinusU/node-appdmg`
 
 ### To package as a deb
 
+`npm run build:linux` or `npm run build:linux32` - for Intel Linux
+
 look at `https://github.com/jordansissel/fpm`
 
     fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a i386 Node-RED-linux-ia32/
     fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
 
 
-#### License [CC0 (Public Domain)](LICENSE.md)
+### To package as an exe
+
+`npm run build:win32` - to build for 32-bit Windows.
+
+`npm run build:win64` - to build for 64-bit Windows.
+
+**Note**: This project was built to run on Mac OSX - To build for windows on other platforms you may need to use other tools.
+
+## License [CC0 (Public Domain)](LICENSE.md)
 
 ## See also
  - **Stand-alone Starter Project** - https://github.com/dceejay/node-red-project-starter
