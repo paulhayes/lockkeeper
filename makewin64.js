@@ -11,6 +11,7 @@ if (fs.existsSync('build/Node-RED-win32-x64')) {
         exe: 'Node-RED.exe',
         setupExe: 'Node-RED-x64-setup.exe',
         setupIcon: 'nodered.ico',
+        loadingGif: 'loading.gif',
         skipUpdateIcon: true
     });
     resultPromise.then(

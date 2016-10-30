@@ -7,7 +7,7 @@
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
 
-        "clean": "rm -rf ./build && mkdir -p ./dist && ./node_modules/.bin/electron-rebuild",
+        "clean": "rm -rf ./build ./dist && mkdir -p ./dist && ./node_modules/.bin/electron-rebuild",
 
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
