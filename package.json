@@ -1,29 +1,29 @@
 {
     "name": "electron-node-red",
-    "version": "1.0.8",
+    "version": "0.15.2",
     "description": "Electron Node-RED application starter",
     "main": "main.js",
     "scripts": {
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
 
-        "clean": "rm -rf ./build ./dist && mkdir -p ./dist && ./node_modules/.bin/electron-rebuild",
+        "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
 
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
-        "pack:win64": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
+        "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-ia32/",
+        "pack:linux64": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-x64",
         "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
-        "pack:linux": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite",
-        "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite",
-        "pack:armv7l": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=armv7l --out=build --overwrite",
+        "pack:win64": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
+        "pack:armv7l": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=armv7l --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-armv7l",
 
-        "build": "npm run build:osx && npm run build:linux && npm run build:linux32",
-        "build:osx": "npm run pack && appdmg appdmg.json dist/Node-RED.dmg",
-        "build:win64": "npm run pack:win64 && ./makewin64.js && rm -f dist/RELEASES dist/*nupkg ",
-        "build:win32": "npm run pack:win32 && ./makewin32.js && rm -f dist/RELEASES dist/*nupkg",
-        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a i386 -p dist build/Node-RED-linux-ia32/",
-        "build:linux": "npm run pack:linux && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a x86_64 -p dist build/Node-RED-linux-x64/",
-        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m conway@uk.ibm.com -a armv7l -p dist build/Node-RED-linux-armv7l/"
+        "build": "npm run clean && npm run build:osx && npm run build:linux64 && npm run build:linux32",
+        "build:osx": "npm run pack:osx && appdmg appdmg.json ../electron-bin/Node-RED-Electron_$npm_package_version.dmg",
+        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a i386   -p ../electron-bin -C build/Node-RED-linux-ia32 --prefix=/opt/node-red --after-install=afterinst.sh ./",
+        "build:linux64": "npm run pack:linux64 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a x86_64 -p ../electron-bin -C build/Node-RED-linux-x64  --prefix=/opt/node-red --after-install=afterinst.sh ./",
+        "build:win32": "npm run pack:win32 && ./makewin32.js",
+        "build:win64": "npm run pack:win64 && ./makewin64.js",
+        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a armv7l -p ../electron-bin -C build/Node-RED-linux-armv7l --prefix=/opt/node-red --after-install=afterinst.sh ./"
     },
     "repository": {
         "type": "git",
@@ -41,8 +41,7 @@
     },
     "keywords": [
         "electron",
-        "quick",
-        "start",
+        "quick start",
         "node-red"
     ],
     "contributors": [

@@ -17,13 +17,13 @@ cd electron-node-red
 npm install && npm run clean && npm start
 ```
 
-## TL:DR
+## TL:DR - building runtimes
 
-Run `npm run pack` to create packages for all platforms
-or `npm run build`  to build a .dmg file for OSX, and deb files for linux (32 and 64bit).
-or `npm run build:osx` to just build for OSX.
+On OSX you can run `./buildall` to build binaries of "everything"... maybe...
 
-Builds are created in the `build` directory. Runtimes are created in the `dist` directory.
+Run `npm run pack` to create packages for all platforms - these are the files required to run, they are not binary installers.
+
+Builds are created in the `build` directory. Runtimes are created in the `../electron-bin` directory.
 
 ## Packaging your application
 
@@ -58,12 +58,16 @@ look at `https://github.com/LinusU/node-appdmg`
 
 ### To package as a deb
 
-`npm run build:linux` or `npm run build:linux32` - for Intel Linux
+`npm run build:linux64` or `npm run build:linux32` - for Intel Linux
 
-look at `https://github.com/jordansissel/fpm`
+Look at `https://github.com/jordansissel/fpm`
 
     fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a i386 Node-RED-linux-ia32/
     fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
+
+Use **sudo dpkg -i ...*** to install the correct deb for your architecture.
+
+Use `Node-RED` command to run. Flows are stored in `~/.node-red`.
 
 
 ### To package as an exe
@@ -73,6 +77,7 @@ look at `https://github.com/jordansissel/fpm`
 `npm run build:win64` - to build for 64-bit Windows.
 
 **Note**: This project was built to run on Mac OSX - To build for windows on other platforms you may need to use other tools.
+
 
 ## License [CC0 (Public Domain)](LICENSE.md)
 

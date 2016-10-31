@@ -1,5 +1,5 @@
 {
-  "title": "Node-RED installer",
+  "title": "Node-RED Electron installer",
   "icon": "nodered.icns",
   "background": "appbkg.png",
   "icon-size": 80,

@@ -1,22 +1,23 @@
 
 'use strict';
 
+// Some settings you can edit easily
+// Start on the dashboard page
+const url = "/ui";
+// url for the editor page
+const urledit = "/admin";
+// tcp port to use
+//const listenPort = "18880"; // fix it just because
+const listenPort = parseInt(Math.random()*16383+49152) // or random ephemeral port
+
 const os = require('os');
 const electron = require('electron');
-// Module to control application life.
 const app = electron.app;
-// Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
-// Start directly on the ui page
-const url = "http://localhost:8000/ui";
-
 const {Menu, MenuItem} = electron;
 
-// this should be placed at top of main.js to handle setup events quickly
-if (handleSquirrelEvent()) {
-   // squirrel event handled and app will exit in 1000ms, so don't do anything else
-   return;
-}
+// this should be placed at top of main.js to handle squirrel setup events quickly
+if (handleSquirrelEvent()) { return; }
 
 var http = require('http');
 var express = require("express");
@@ -31,18 +32,21 @@ var red_app = express();
 // Create a server
 var server = http.createServer(red_app);
 
-// If on Windows move the userdir away from the asar bundle.
-var userdir = __dirname;
-if (os.platform() === "win32") {
+var userdir;
+if (process.argv[1] && (process.argv[1] === "main.js")) {
+    userdir = __dirname;
+}
+else { // We set the user directory to be in the users home directory...
     const fs = require('fs');
-    userdir = os.homedir() + '\\.node-red';
+    userdir = os.homedir() + '/.node-red';
     if (!fs.existsSync(userdir)) {
         fs.mkdirSync(userdir);
     }
-    if (!fs.existsSync(userdir+"\\flows.json")) {
-        fs.writeFileSync(userdir+"\\flows.json", fs.readFileSync(__dirname+"\\flows.json"));
+    if (!fs.existsSync(userdir+"/flows.json")) {
+        fs.writeFileSync(userdir+"/flows.json", fs.readFileSync(__dirname+"/flows.json"));
     }
 }
+console.log("Setting UserDir to ",userdir);
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
@@ -67,9 +71,9 @@ red_app.use(settings.httpNodeRoot,RED.httpNode);
 var template = [{
     label: "Application",
     submenu: [
-        { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+        { role: 'about' },
         { type: "separator" },
-        { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+        { role: 'quit' }
     ]}, {
     label: "Edit",
     submenu: [
@@ -80,7 +84,45 @@ var template = [{
         { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
         { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
         { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    ]}
+    ]}, {
+    label: 'View',
+    submenu: [
+      { label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click (item, focusedWindow) { if (focusedWindow) focusedWindow.reload() }
+      },
+      { label: 'Toggle Developer Tools',
+        accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+        click (item, focusedWindow) { if (focusedWindow) focusedWindow.webContents.toggleDevTools() }
+      },
+      { type: 'separator' },
+      { role: 'resetzoom' },
+      { role: 'zoomin' },
+      { role: 'zoomout' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+      { role: 'minimize' }
+    ]
+  }, {
+    label: 'Node-RED',
+    submenu: [
+        { label: 'Editor',
+          accelerator: "Shift+CmdOrCtrl+E",
+          click () { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
+        },
+        { label: 'Dashboard',
+          accelerator: "Shift+CmdOrCtrl+D",
+          click () { mainWindow.loadURL("http://localhost:"+listenPort+url); }
+        },
+        { type: 'separator' },
+        { label: 'Documentation',
+          click () { require('electron').shell.openExternal('http://nodered.org/docs') }
+        },
+        { label: 'Google group',
+          click () { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
+        }
+    ]
+  }
 ];
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -104,7 +146,7 @@ function createWindow () {
 
     var webContents = mainWindow.webContents;
     webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
-        if ((httpResponseCode == 404) && (newURL == url)) {
+        if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+url))) {
             setTimeout(webContents.reload, 200);
         }
         Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -151,16 +193,18 @@ app.on('activate', function () {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
+        mainWindow.loadURL("http://127.0.0.1:"+listenPort+url);
     }
 });
 
 // Start the Node-RED runtime, then load the inital page
 RED.start().then(function() {
-    server.listen(8000,function() {
-        mainWindow.loadURL(url);
+    server.listen(listenPort,"127.0.0.1",function() {
+        mainWindow.loadURL("http://127.0.0.1:"+listenPort+url);
     });
 });
 
+///////////////////////////////////////////////////////
 // All this Squirrel stuff is for the Windows installer
 function handleSquirrelEvent() {
   if (process.argv.length === 1) {
