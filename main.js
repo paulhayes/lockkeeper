@@ -2,6 +2,8 @@
 'use strict';
 
 // Some settings you can edit easily
+// Flows file name
+const flowfile = 'flows.json';
 // Start on the dashboard page
 const url = "/ui";
 // url for the editor page
@@ -42,8 +44,8 @@ else { // We set the user directory to be in the users home directory...
     if (!fs.existsSync(userdir)) {
         fs.mkdirSync(userdir);
     }
-    if (!fs.existsSync(userdir+"/flows.json")) {
-        fs.writeFileSync(userdir+"/flows.json", fs.readFileSync(__dirname+"/flows.json"));
+    if (!fs.existsSync(userdir+"/"+flowfile)) {
+        fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
     }
 }
 console.log("Setting UserDir to ",userdir);
@@ -54,7 +56,7 @@ var settings = {
     httpAdminRoot:"/admin",
     httpNodeRoot: "/",
     userDir: userdir,
-    flowFile: "flows.json",
+    flowFile: flowfile,
     functionGlobalContext: { }    // enables global context
 };
 
