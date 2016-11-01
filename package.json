@@ -6,7 +6,8 @@
     "scripts": {
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
-
+        "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
+ 
         "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
 
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",

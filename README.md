@@ -25,6 +25,8 @@ Run `npm run pack` to create packages for all platforms - these are the files re
 
 Builds are created in the `build` directory. Runtimes are created in the `../electron-bin` directory.
 
+**Note**: this was written to work on a Mac... other tools may/will be needed on other platforms.
+
 ## Packaging your application
 
 If you want to distribute executables of this project, the easiest way is to use electron-packager:

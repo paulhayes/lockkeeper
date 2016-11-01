@@ -77,61 +77,62 @@ var template = [{
         { type: "separator" },
         { role: 'quit' }
     ]}, {
-    label: "Edit",
-    submenu: [
-        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-        { type: "separator" },
-        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    ]}, {
-    label: 'View',
-    submenu: [
-      { label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
-        click (item, focusedWindow) { if (focusedWindow) focusedWindow.reload() }
-      },
-      { label: 'Toggle Developer Tools',
-        accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-        click (item, focusedWindow) { if (focusedWindow) focusedWindow.webContents.toggleDevTools() }
-      },
-      { type: 'separator' },
-      { role: 'resetzoom' },
-      { role: 'zoomin' },
-      { role: 'zoomout' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' },
-      { role: 'minimize' }
-    ]
-  }, {
     label: 'Node-RED',
     submenu: [
         { label: 'Editor',
-          accelerator: "Shift+CmdOrCtrl+E",
-          click () { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
+        accelerator: "Shift+CmdOrCtrl+E",
+        click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
         },
         { label: 'Dashboard',
-          accelerator: "Shift+CmdOrCtrl+D",
-          click () { mainWindow.loadURL("http://localhost:"+listenPort+url); }
+        accelerator: "Shift+CmdOrCtrl+D",
+        click() { mainWindow.loadURL("http://localhost:"+listenPort+url); }
         },
         { type: 'separator' },
         { label: 'Documentation',
-          click () { require('electron').shell.openExternal('http://nodered.org/docs') }
+        click() { require('electron').shell.openExternal('http://nodered.org/docs') }
+        },
+        { label: 'Flows and Nodes',
+        click() { require('electron').shell.openExternal('http://flows.nodered.org') }
         },
         { label: 'Google group',
-          click () { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
+        click() { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
         }
-    ]
-  }
+    ]}, {
+    // label: "Edit",
+    // submenu: [
+    //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+    //     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+    //     { type: "separator" },
+    //     { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+    //     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+    //     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+    //     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+    // ]}, {
+    label: 'View',
+    submenu: [
+        { label: 'Reload',
+            accelerator: 'CmdOrCtrl+R',
+            click(item, focusedWindow) { if (focusedWindow) focusedWindow.reload(); }
+        },
+        { label: 'Toggle Developer Tools',
+            accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+            click(item, focusedWindow) { if (focusedWindow) focusedWindow.webContents.toggleDevTools(); }
+        },
+        { type: 'separator' },
+        { role: 'resetzoom' },
+        { role: 'zoomin' },
+        { role: 'zoomout' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+        { role: 'minimize' }
+    ]}
 ];
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function createWindow () {
+function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
@@ -190,7 +191,7 @@ app.on('window-all-closed', function () {
     }
 });
 
-app.on('activate', function () {
+app.on('activate', function() {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
