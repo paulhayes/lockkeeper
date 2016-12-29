@@ -1,13 +1,13 @@
 {
     "name": "electron-node-red",
-    "version": "0.15.2",
+    "version": "0.15.3",
     "description": "Electron Node-RED application starter",
     "main": "main.js",
     "scripts": {
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
         "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
- 
+
         "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
 
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
@@ -38,6 +38,7 @@
         "node-red-node-random": "*",
         "node-red-node-smooth": "*",
         "node-red-contrib-play-audio": "*",
+        "node-red-contrib-n2n": "*",
         "express": "^4.14.0"
     },
     "keywords": [
@@ -49,13 +50,13 @@
         {"name":"Dave Conway-Jones"},
         {"name":"Nathanaël Lécaudé"}
     ],
-    "license": "CC0-1.0",
+    "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/dceejay/electron-node-red/issues"
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron": "^1.4.4",
+        "electron": "^1.4.13",
         "electron-rebuild": "*",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "*"
