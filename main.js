@@ -79,13 +79,13 @@ var template = [{
     ]}, {
     label: 'Node-RED',
     submenu: [
-        { label: 'Editor',
-        accelerator: "Shift+CmdOrCtrl+E",
-        click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
-        },
         { label: 'Dashboard',
         accelerator: "Shift+CmdOrCtrl+D",
         click() { mainWindow.loadURL("http://localhost:"+listenPort+url); }
+        },
+        { label: 'Editor',
+        accelerator: "Shift+CmdOrCtrl+E",
+        click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
         },
         { type: 'separator' },
         { label: 'Documentation',
@@ -98,16 +98,16 @@ var template = [{
         click() { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
         }
     ]}, {
-    // label: "Edit",
-    // submenu: [
-    //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-    //     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-    //     { type: "separator" },
-    //     { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-    //     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-    //     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-    //     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    // ]}, {
+    label: "Edit",
+    submenu: [
+        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+        { type: "separator" },
+        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+    ]}, {
     label: 'View',
     submenu: [
         { label: 'Reload',
