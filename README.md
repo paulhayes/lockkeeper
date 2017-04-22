@@ -64,8 +64,8 @@ look at `https://github.com/LinusU/node-appdmg`
 
 Look at `https://github.com/jordansissel/fpm`
 
-    fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a i386 Node-RED-linux-ia32/
-    fpm -s dir -t deb -f -n node-red-electron -v 0.15.2 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
+    fpm -s dir -t deb -f -n node-red-electron -v 0.16.2 -m your-email@example.com -a i386 Node-RED-linux-ia32/
+    fpm -s dir -t deb -f -n node-red-electron -v 0.16.2 -m your-email@example.com -a x86_64 Node-RED-linux-x64/
 
 Use **sudo dpkg -i ...*** to install the correct deb for your architecture.
 

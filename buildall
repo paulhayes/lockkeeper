@@ -1,7 +1,7 @@
 npm i
-cd node_modules/electron-winstaller
-npm i is-property
-cd ../..
+#cd node_modules/electron-winstaller
+#npm i is-property
+#cd ../..
 rm -rf node_modules/node-red/node_modules/node-red-node-serialport node_modules/node-red/node_modules/node-red-node-feedparser node_modules/node-red/node_modules/node-red-node-email
 ./node_modules/.bin/electron-rebuild
 npm run clean
