@@ -3,9 +3,9 @@
 
 // Some settings you can edit easily
 // Flows file name
-const flowfile = 'flows.json';
+const flowfile = 'electronflow.json';
 // Start on the dashboard page
-const url = "/ui";
+const url = "/ui/#/0";
 // url for the editor page
 const urledit = "/admin";
 // tcp port to use
@@ -150,7 +150,7 @@ function createWindow() {
     var webContents = mainWindow.webContents;
     webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
         if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+url))) {
-            setTimeout(webContents.reload, 200);
+            setTimeout(webContents.reload, 250);
         }
         Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     });
