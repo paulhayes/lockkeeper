@@ -1,6 +1,6 @@
 {
     "name": "electron-node-red",
-    "version": "0.17.5",
+    "version": "0.18.3",
     "description": "Electron Node-RED application starter",
     "main": "main.js",
     "scripts": {
@@ -12,8 +12,8 @@
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
         "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-ia32/",
         "pack:linux64": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-x64",
-        "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
-        "pack:win64": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar=true --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
+        "pack:win32": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=ia32 --out=build --asar --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
+        "pack:win64": "electron-packager . Node-RED --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar --overwrite --win32metadata.CompanyName='IBM Corp.' --win32metadata.ProductName='Node-RED Electron'",
         "pack:armv7l": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=armv7l --out=build --overwrite && cp afterinst.sh build/Node-RED-linux-armv7l",
         "build": "npm run clean && npm run build:osx && npm run build:linux64 && npm run build:linux32",
         "build:osx": "npm run pack:osx && appdmg appdmg.json ../electron-bin/Node-RED-Electron_$npm_package_version.dmg",
@@ -29,14 +29,14 @@
     },
     "dependencies": {
         "express": "^4.15.3",
-        "node-red": "*",
-        "node-red-contrib-play-audio": "*",
-        "node-red-contrib-web-worldmap": "*",
-        "node-red-dashboard": "*",
-        "node-red-node-base64": "*",
+        "node-red": "~0.18.3",
+        "node-red-contrib-play-audio": "~2.2.4",
+        "node-red-contrib-web-worldmap": "~1.1.9",
+        "node-red-dashboard": "~2.8.1",
+        "node-red-node-base64": "~0.1.1",
         "node-red-node-geofence": "*",
-        "node-red-node-random": "*",
-        "node-red-node-smooth": "*"
+        "node-red-node-random": "~0.1.0",
+        "node-red-node-smooth": "~0.1.0"
     },
     "keywords": [
         "electron",
@@ -58,7 +58,7 @@
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
         "electron": "1.7.9",
-        "electron-rebuild": "*",
+        "electron-rebuild": "~1.7.3",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"
     }

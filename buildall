@@ -10,6 +10,8 @@ rm -rf build/
 npm run build:linux32
 rm -rf build/
 npm run build:linux64
+# rm -rf build/
+# npm run build:armv7l
 rm -rf build/
 npm run build:win32
 rm -rf build/ ../electron-bin/*.nupkg ../electron-bin/RELEASES
