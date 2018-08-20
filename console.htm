@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Node-RED Console</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1, minimum-scale=1">
+    </head>
+    <body style="margin:0;" >
+        <font style="font-family:Arial; font-size:9pt;">
+        <div id="header" style="background-color:#910000; color:white; height:16px; padding:8px;">Most recent messages at top<input type="button" style="float:right;" value="Clear Log" onclick="clearList()";/></div>
+        <div id="debug" style="padding:4px;"></div>
+        </font>
+        <script>
+            const { ipcRenderer } = require('electron');
+            const ipc = require('electron').ipcRenderer;
+            var list = "";
+            var clearList = function() {
+                list = "";
+                document.getElementById("debug").innerHTML = list;
+            }
+
+            ipc.on('debugMsg', (event, data) => {
+                var ts = (new Date(data.timestamp)).toISOString();
+                ts = ts.replace("Z"," ").replace("T"," ");
+                //list = list+"<br/>"+(new Date(data.timestamp)).toISOString()+" : "+data.msg;
+                list = ts+" : "+data.msg+"<br/>"+list;
+                document.getElementById("debug").innerHTML = list;
+                //window.scrollTo(0,document.body.scrollHeight);
+                if (list.length > 50000) { list = list.substr(0,40000); }
+            });
+        </script>
+    </body>
+</html>

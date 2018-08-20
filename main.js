@@ -5,15 +5,21 @@
 // Flows file name
 const flowfile = 'electronflow.json';
 // Start on the dashboard page
-const url = "/ui/#/0";
+const urldash = "/ui/#/0";
 // url for the editor page
-const urledit = "/admin";
+const urledit = "/red";
+// url for the console page
+const urlconsole = "/console.htm";
 // tcp port to use
 //const listenPort = "18880"; // fix it just because
 const listenPort = parseInt(Math.random()*16383+49152) // or random ephemeral port
 
 const os = require('os');
+const url = require('url');
+const path = require('path');
 const electron = require('electron');
+const {ipcMain} = require('electron');
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
@@ -29,7 +35,8 @@ var RED = require("node-red");
 var red_app = express();
 
 // Add a simple route for static content served from 'public'
-//red_app.use("/",express.static("public"));
+red_app.use("/",express.static("web"));
+//red_app.use(express.static(__dirname +"/public"));
 
 // Create a server
 var server = http.createServer(red_app);
@@ -49,15 +56,33 @@ else { // We set the user directory to be in the users home directory...
     }
 }
 console.log("Setting UserDir to ",userdir);
+// console.log("DIR",__dirname);
+// console.log("PORT",listenPort);
+
+// Keep a global reference of the window objects, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindow;
+let conWindow;
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
-    verbose: true,
-    httpAdminRoot:"/admin",
+    httpAdminRoot: "/red",
     httpNodeRoot: "/",
     userDir: userdir,
     flowFile: flowfile,
-    functionGlobalContext: { }    // enables global context
+    editorTheme: { projects: { enabled: false } },
+    functionGlobalContext: { },    // enables global context
+    logging: {
+        websock: {
+            level: 'info',
+            metrics: false,
+            handler: function() {
+                return function(msg) {
+                    if (conWindow) { conWindow.webContents.send('debugMsg', msg); }
+                }
+            }
+        }
+    }
 };
 
 // Initialise the runtime with a server and settings
@@ -66,7 +91,7 @@ RED.init(server,settings);
 // Serve the editor UI from /red
 red_app.use(settings.httpAdminRoot,RED.httpAdmin);
 
-// Serve the http nodes UI from /api
+// Serve the http nodes UI from /
 red_app.use(settings.httpNodeRoot,RED.httpNode);
 
 // Create the Application's main menu
@@ -79,9 +104,13 @@ var template = [{
     ]}, {
     label: 'Node-RED',
     submenu: [
+        { label: 'Console',
+        accelerator: "Shift+CmdOrCtrl+C",
+        click() { createConsole(); }
+        },
         { label: 'Dashboard',
         accelerator: "Shift+CmdOrCtrl+D",
-        click() { mainWindow.loadURL("http://localhost:"+listenPort+url); }
+        click() { mainWindow.loadURL("http://localhost:"+listenPort+urldash); }
         },
         { label: 'Editor',
         accelerator: "Shift+CmdOrCtrl+E",
@@ -112,11 +141,11 @@ var template = [{
     submenu: [
         { label: 'Reload',
             accelerator: 'CmdOrCtrl+R',
-            click(item, focusedWindow) { if (focusedWindow) focusedWindow.reload(); }
+            click(item, focusedWindow) { if (focusedWindow) { focusedWindow.reload(); }}
         },
         { label: 'Toggle Developer Tools',
             accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-            click(item, focusedWindow) { if (focusedWindow) focusedWindow.webContents.toggleDevTools(); }
+            click(item, focusedWindow) { if (focusedWindow) { focusedWindow.webContents.toggleDevTools(); }}
         },
         { type: 'separator' },
         { role: 'resetzoom' },
@@ -128,9 +157,26 @@ var template = [{
     ]}
 ];
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+function createConsole() {
+    // Create the hidden console window
+    conWindow = new BrowserWindow({
+        title:"Node-RED Console", width:800, height:600, frame:true, show:true
+    });
+    //conWindow.loadURL("http://localhost:"+listenPort+urlconsole);
+    conWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'console.htm'),
+        protocol: 'file:',
+        slashes: true
+    }))
+    conWindow.webContents.on('did-finish-load', () => {
+        //console.log("LOADED CONSOLE");
+        conWindow.webContents.send('debugMsg', "Ready");
+    });
+    conWindow.on('closed', function() {
+        conWindow = null;
+    });
+    //conWindow.webContents.openDevTools();
+}
 
 function createWindow() {
     // Create the browser window.
@@ -147,16 +193,16 @@ function createWindow() {
         icon: __dirname + "/nodered.png"
     });
 
-    var webContents = mainWindow.webContents;
-    webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
-        if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+url))) {
-            setTimeout(webContents.reload, 250);
+    mainWindow.webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
+        if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+urldash))) {
+            setTimeout(mainWindow.webContents.reload, 250);
         }
         Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     });
 
-    // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.on('did-finish-load', () => {
+    //     console.log("LOADED DASHBOARD");
+    // });
 
     mainWindow.webContents.on("new-window", function(e, url, frameName, disposition, options) {
         // if a child window opens... modify any other options such as width/height, etc
@@ -170,25 +216,23 @@ function createWindow() {
         //frameName = "child";
     })
 
+    // Open the DevTools.
+    //mainWindow.webContents.openDevTools();
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
         mainWindow = null;
     });
 }
 
 // Called when Electron has finished initialization and is ready to create browser windows.
-app.on('ready', createWindow);
+app.on('ready', createWindow );
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    if (process.platform !== 'darwin') { app.quit(); }
 });
 
 app.on('activate', function() {
@@ -196,14 +240,14 @@ app.on('activate', function() {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
-        mainWindow.loadURL("http://127.0.0.1:"+listenPort+url);
+        mainWindow.loadURL("http://127.0.0.1:"+listenPort+urldash);
     }
 });
 
 // Start the Node-RED runtime, then load the inital page
 RED.start().then(function() {
     server.listen(listenPort,"127.0.0.1",function() {
-        mainWindow.loadURL("http://127.0.0.1:"+listenPort+url);
+        mainWindow.loadURL("http://127.0.0.1:"+listenPort+urldash);
     });
 });
 
@@ -269,4 +313,4 @@ function handleSquirrelEvent() {
       app.quit();
       return true;
   }
-};
+}
