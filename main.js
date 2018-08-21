@@ -10,6 +10,8 @@ const urldash = "/ui/#/0";
 const urledit = "/red";
 // url for the console page
 const urlconsole = "/console.htm";
+// url for the worldmap page
+const urlmap = "/worldmap";
 // tcp port to use
 //const listenPort = "18880"; // fix it just because
 const listenPort = parseInt(Math.random()*16383+49152) // or random ephemeral port
@@ -18,7 +20,6 @@ const os = require('os');
 const url = require('url');
 const path = require('path');
 const electron = require('electron');
-const {ipcMain} = require('electron');
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -70,7 +71,7 @@ var settings = {
     httpNodeRoot: "/",
     userDir: userdir,
     flowFile: flowfile,
-    editorTheme: { projects: { enabled: false } },
+    editorTheme: { projects:{ enabled:true } },
     functionGlobalContext: { },    // enables global context
     logging: {
         websock: {
@@ -116,15 +117,19 @@ var template = [{
         accelerator: "Shift+CmdOrCtrl+E",
         click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
         },
+        { label: 'Worldmap',
+        accelerator: "Shift+CmdOrCtrl+M",
+        click() { mainWindow.loadURL("http://localhost:"+listenPort+urlmap); }
+        },
         { type: 'separator' },
         { label: 'Documentation',
-        click() { require('electron').shell.openExternal('http://nodered.org/docs') }
+        click() { require('electron').shell.openExternal('https://nodered.org/docs') }
         },
         { label: 'Flows and Nodes',
-        click() { require('electron').shell.openExternal('http://flows.nodered.org') }
+        click() { require('electron').shell.openExternal('https://flows.nodered.org') }
         },
-        { label: 'Google group',
-        click() { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
+        { label: 'Discourse Forum',
+        click() { require('electron').shell.openExternal('https://discourse.nodered.org/') }
         }
     ]}, {
     label: "Edit",
@@ -157,7 +162,20 @@ var template = [{
     ]}
 ];
 
+// function openFlow() {
+//     dialog.showOpenDialog(function (fileNames) {
+//         if (fileNames === undefined) {
+//             console.log("No file selected");
+//         }
+//         else {
+//             console.log(fileNames[0]);
+//             //readFile(fileNames[0]);
+//         }
+//     });
+// }
+
 function createConsole() {
+    if (conWindow) { conWindow.show(); return; }
     // Create the hidden console window
     conWindow = new BrowserWindow({
         title:"Node-RED Console", width:800, height:600, frame:true, show:true

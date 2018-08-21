@@ -23,10 +23,8 @@
             ipc.on('debugMsg', (event, data) => {
                 var ts = (new Date(data.timestamp)).toISOString();
                 ts = ts.replace("Z"," ").replace("T"," ");
-                //list = list+"<br/>"+(new Date(data.timestamp)).toISOString()+" : "+data.msg;
                 list = ts+" : "+data.msg+"<br/>"+list;
                 document.getElementById("debug").innerHTML = list;
-                //window.scrollTo(0,document.body.scrollHeight);
                 if (list.length > 50000) { list = list.substr(0,40000); }
             });
         </script>
