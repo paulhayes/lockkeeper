@@ -57,7 +57,7 @@
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron": "1.7.9",
+        "electron": "~2.0.7",
         "electron-rebuild": "~1.7.3",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"

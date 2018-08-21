@@ -130,25 +130,27 @@ var template = [{
         },
         { type: 'separator' },
         { label: 'Documentation',
-        click() { require('electron').shell.openExternal('https://nodered.org/docs') }
+        click() { electron.shell.openExternal('https://nodered.org/docs') }
         },
         { label: 'Flows and Nodes',
-        click() { require('electron').shell.openExternal('https://flows.nodered.org') }
+        click() { electron.shell.openExternal('https://flows.nodered.org') }
         },
         { label: 'Discourse Forum',
-        click() { require('electron').shell.openExternal('https://discourse.nodered.org/') }
-        }
-    ]}, {
-    label: "Edit",
-    submenu: [
-        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+        click() { electron.shell.openExternal('https://discourse.nodered.org/') }
+        },
         { type: "separator" },
-        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+        { role: 'quit' }
     ]}, {
+    // label: "Edit",
+    // submenu: [
+    //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+    //     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+    //     { type: "separator" },
+    //     { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+    //     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+    //     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+    //     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+    // ]}, {
     label: 'View',
     submenu: [
         { label: 'Reload',
@@ -181,11 +183,15 @@ var template = [{
 //     });
 // }
 
+// Create the console log window
 function createConsole() {
     if (conWindow) { conWindow.show(); return; }
     // Create the hidden console window
     conWindow = new BrowserWindow({
-        title:"Node-RED Console", width:800, height:600, frame:true, show:true
+        title: "Node-RED Console",
+        width: 800,
+        height: 600,
+        icon: path.join(__dirname, 'nodered.png')
     });
     //conWindow.loadURL("http://localhost:"+listenPort+urlconsole);
     conWindow.loadURL(url.format({
@@ -196,15 +202,14 @@ function createConsole() {
     conWindow.webContents.on('did-finish-load', () => {
         conWindow.webContents.send('logBuff', logBuffer);
     });
-
-    conWindow.on('closed', function() {
+    conWindow.on('closed', () => {
         conWindow = null;
     });
     //conWindow.webContents.openDevTools();
 }
 
+// Create the main browser window
 function createWindow() {
-    // Create the browser window.
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         webPreferences: {
@@ -215,7 +220,7 @@ function createWindow() {
         //titleBarStyle: "hidden",
         width: 1024,
         height: 768,
-        icon: __dirname + "/nodered.png"
+        icon: path.join(__dirname, 'nodered.png')
     });
 
     mainWindow.webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
@@ -241,13 +246,12 @@ function createWindow() {
         //frameName = "child";
     })
 
-    // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
-
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
+    // Open the DevTools.
+    //mainWindow.webContents.openDevTools();
 }
 
 // Called when Electron has finished initialization and is ready to create browser windows.
@@ -279,63 +283,57 @@ RED.start().then(function() {
 ///////////////////////////////////////////////////////
 // All this Squirrel stuff is for the Windows installer
 function handleSquirrelEvent() {
-  if (process.argv.length === 1) {
-    return false;
-  }
+    if (process.argv.length === 1) { return false; }
 
-  const ChildProcess = require('child_process');
-  const path = require('path');
+    const path = require('path');
+    const ChildProcess = require('child_process');
+    const appFolder = path.resolve(process.execPath, '..');
+    const rootAtomFolder = path.resolve(appFolder, '..');
+    const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+    const exeName = path.basename(process.execPath);
+    const spawn = function(command, args) {
+        let spawnedProcess, error;
 
-  const appFolder = path.resolve(process.execPath, '..');
-  const rootAtomFolder = path.resolve(appFolder, '..');
-  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath);
+        try { spawnedProcess = ChildProcess.spawn(command, args, {detached: true}); }
+        catch (error) {}
+        return spawnedProcess;
+    };
 
-  const spawn = function(command, args) {
-    let spawnedProcess, error;
+    const spawnUpdate = function(args) {
+        return spawn(updateDotExe, args);
+    };
 
-    try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+    const squirrelEvent = process.argv[1];
+    switch (squirrelEvent) {
+        case '--squirrel-install':
+        case '--squirrel-updated':
+        // Optionally do things such as:
+        // - Add your .exe to the PATH
+        // - Write to the registry for things like file associations and
+        //   explorer context menus
 
-    return spawnedProcess;
-  };
+        // Install desktop and start menu shortcuts
+        spawnUpdate(['--createShortcut', exeName]);
 
-  const spawnUpdate = function(args) {
-    return spawn(updateDotExe, args);
-  };
+        setTimeout(app.quit, 1000);
+        return true;
 
-  const squirrelEvent = process.argv[1];
-  switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
+        case '--squirrel-uninstall':
+        // Undo anything you did in the --squirrel-install and
+        // --squirrel-updated handlers
 
-      // Install desktop and start menu shortcuts
-      spawnUpdate(['--createShortcut', exeName]);
+        // Remove desktop and start menu shortcuts
+        spawnUpdate(['--removeShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+        setTimeout(app.quit, 1000);
+        return true;
 
-    case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
+        case '--squirrel-obsolete':
+        // This is called on the outgoing version of your app before
+        // we update to the new version - it's the opposite of
+        // --squirrel-updated
 
-      // Remove desktop and start menu shortcuts
-      spawnUpdate(['--removeShortcut', exeName]);
-
-      setTimeout(app.quit, 1000);
-      return true;
-
-    case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
-
-      app.quit();
-      return true;
-  }
+        app.quit();
+        return true;
+    }
 }
