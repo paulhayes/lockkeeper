@@ -8,24 +8,28 @@
     </head>
     <body style="margin:0;" >
         <font style="font-family:'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:9pt;">
-        <div id="header" style="background-color:#910000; color:white; font-size:larger; height:16px; padding:8px;">Most recent messages at top<input type="button" style="float:right;" value="Clear Log" onclick="clearList()";/></div>
+        <div id="header" style="background-color:#910000; position:fixed; height:16px; width:100%; padding:8px;"><input type="button" value="Clear Log" onclick="clearList()";/></div>
         <div id="debug" style="padding:4px; padding-left:8px;"></div>
         </font>
         <script>
+            const logLength = 250;
             const { ipcRenderer } = require('electron');
             const ipc = require('electron').ipcRenderer;
-            var list = "";
+            var list = [];
             var clearList = function() {
-                list = "";
-                document.getElementById("debug").innerHTML = list;
+                list = [];
+                document.getElementById("debug").innerHTML = "";
             }
 
+            ipc.on('logBuff', (event, data) => {
+                list = data;
+                document.getElementById("debug").innerHTML = list.join("<br/>");
+            });
             ipc.on('debugMsg', (event, data) => {
-                var ts = (new Date(data.timestamp)).toISOString();
-                ts = ts.replace("Z"," ").replace("T"," ");
-                list = ts+" : "+data.msg+"<br/>"+list;
-                document.getElementById("debug").innerHTML = list;
-                if (list.length > 50000) { list = list.substr(0,40000); }
+                list.push(data);
+                if (list.length > logLength) { list.shift(); }
+                document.getElementById("debug").innerHTML = list.join("<br/>");
+                window.scrollTo(0,document.body.scrollHeight);
             });
         </script>
     </body>

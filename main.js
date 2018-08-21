@@ -64,6 +64,8 @@ console.log("Setting UserDir to ",userdir);
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let conWindow;
+let logBuffer = [];
+let logLength = 250;
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
@@ -79,7 +81,12 @@ var settings = {
             metrics: false,
             handler: function() {
                 return function(msg) {
-                    if (conWindow) { conWindow.webContents.send('debugMsg', msg); }
+                    var ts = (new Date(msg.timestamp)).toISOString();
+                    ts = ts.replace("Z"," ").replace("T"," ");
+                    var line = ts+" : "+msg.msg;
+                    logBuffer.push(line);
+                    if (conWindow) { conWindow.webContents.send('debugMsg', line); }
+                    if (logBuffer.length > logLength) { logBuffer.shift(); }
                 }
             }
         }
@@ -187,9 +194,9 @@ function createConsole() {
         slashes: true
     }))
     conWindow.webContents.on('did-finish-load', () => {
-        //console.log("LOADED CONSOLE");
-        conWindow.webContents.send('debugMsg', "Ready");
+        conWindow.webContents.send('logBuff', logBuffer);
     });
+
     conWindow.on('closed', function() {
         conWindow = null;
     });
