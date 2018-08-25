@@ -2,37 +2,38 @@
 'use strict';
 
 // Some settings you can edit easily
-// Flows file name
-const flowfile = 'electronflow.json';
-// Start on the dashboard page
-const urldash = "/ui/#/0";
-// url for the editor page
-const urledit = "/red";
-// url for the console page
-const urlconsole = "/console.htm";
-// url for the worldmap page
-const urlmap = "/worldmap";
+
+const editable = true;      // Set this to false to create a run only application - no editor/no console
+const allowLoadSave = false;        // set to true to allow omport and export of flow
+const showMap = false;              // set to true to add Worldmap to the menu
+let flowfile = 'electronflow.json'; // default Flows file name - loaded at start
+const urldash = "/ui/#/0";          // Start on the dashboard page
+const urledit = "/red";             // url for the editor page
+const urlconsole = "/console.htm";  // url for the console page
+const urlmap = "/worldmap";         // url for the worldmap
+
 // tcp port to use
-//const listenPort = "18880"; // fix it just because
-const listenPort = parseInt(Math.random()*16383+49152) // or random ephemeral port
+//const listenPort = "18880";                           // fix it if you like
+const listenPort = parseInt(Math.random()*16383+49152)  // or random ephemeral port
 
 const os = require('os');
+const fs = require('fs');
 const url = require('url');
 const path = require('path');
+const http = require('http');
+const express = require("express");
 const electron = require('electron');
 
 const app = electron.app;
+const ipc = electron.ipcMain;
+const dialog = electron.dialog;
 const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
 
 // this should be placed at top of main.js to handle squirrel setup events quickly
 if (handleSquirrelEvent()) { return; }
 
-var http = require('http');
-var express = require("express");
 var RED = require("node-red");
-
-// Create an Express app
 var red_app = express();
 
 // Add a simple route for static content served from 'public'
@@ -42,22 +43,22 @@ red_app.use("/",express.static("web"));
 // Create a server
 var server = http.createServer(red_app);
 
-var userdir;
-if (process.argv[1] && (process.argv[1] === "main.js")) {
-    userdir = __dirname;
-}
-else { // We set the user directory to be in the users home directory...
-    const fs = require('fs');
-    userdir = os.homedir() + '/.node-red';
-    if (!fs.existsSync(userdir)) {
-        fs.mkdirSync(userdir);
+var userdir = __dirname;
+if (editable) {
+    if (process.argv[1] && (process.argv[1] === "main.js")) {
+        userdir = __dirname;
     }
-    if (!fs.existsSync(userdir+"/"+flowfile)) {
-        fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+    else { // We set the user directory to be in the users home directory...
+        userdir = os.homedir() + '/.node-red';
+        if (!fs.existsSync(userdir)) {
+            fs.mkdirSync(userdir);
+        }
+        if (!fs.existsSync(userdir+"/"+flowfile)) {
+            fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+        }
     }
 }
-console.log("Setting UserDir to ",userdir);
-// console.log("DIR",__dirname);
+console.log("UserDir :",userdir);
 // console.log("PORT",listenPort);
 
 // Keep a global reference of the window objects, if you don't, the window will
@@ -67,13 +68,15 @@ let conWindow;
 let logBuffer = [];
 let logLength = 250;
 
+ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
+
 // Create the settings object - see default settings.js file for other options
 var settings = {
-    httpAdminRoot: "/red",
+    httpAdminRoot: "/red",  // set to false to disable editor/deploy
     httpNodeRoot: "/",
     userDir: userdir,
     flowFile: flowfile,
-    editorTheme: { projects:{ enabled:true } },
+    editorTheme: { projects:{ enabled:false } },
     functionGlobalContext: { },    // enables global context
     logging: {
         websock: {
@@ -81,67 +84,83 @@ var settings = {
             metrics: false,
             handler: function() {
                 return function(msg) {
-                    var ts = (new Date(msg.timestamp)).toISOString();
-                    ts = ts.replace("Z"," ").replace("T"," ");
-                    var line = ts+" : "+msg.msg;
-                    logBuffer.push(line);
-                    if (conWindow) { conWindow.webContents.send('debugMsg', line); }
-                    if (logBuffer.length > logLength) { logBuffer.shift(); }
+                    if (editable) {  // No logging if not editable
+                        var ts = (new Date(msg.timestamp)).toISOString();
+                        ts = ts.replace("Z"," ").replace("T"," ");
+                        var line = ts+" : "+msg.msg;
+                        logBuffer.push(line);
+                        if (conWindow) { conWindow.webContents.send('debugMsg', line); }
+                        if (logBuffer.length > logLength) { logBuffer.shift(); }
+                    }
                 }
             }
         }
     }
 };
+if (!editable) {
+    settings.httpAdminRoot = false;
+    settings.readOnly = true;
+ }
 
 // Initialise the runtime with a server and settings
 RED.init(server,settings);
 
 // Serve the editor UI from /red
-red_app.use(settings.httpAdminRoot,RED.httpAdmin);
+if (settings.httpAdminRoot !== false) {
+    red_app.use(settings.httpAdminRoot,RED.httpAdmin);
+}
 
 // Serve the http nodes UI from /
 red_app.use(settings.httpNodeRoot,RED.httpNode);
 
 // Create the Application's main menu
-var template = [{
-    label: "Application",
+var template = [
+    // {label: "Application",
+    // submenu: [
+    //     { role: 'about' },
+    //     { type: "separator" },
+    //     { role: 'quit' }
+    // ]},
+    { label: 'Node-RED',
     submenu: [
-        { role: 'about' },
-        { type: "separator" },
-        { role: 'quit' }
-    ]}, {
-    label: 'Node-RED',
-    submenu: [
-        { label: 'Console',
-        accelerator: "Shift+CmdOrCtrl+C",
-        click() { createConsole(); }
+        {   label: 'Import Flow',
+            click() { openFlow(); }
         },
-        { label: 'Dashboard',
-        accelerator: "Shift+CmdOrCtrl+D",
-        click() { mainWindow.loadURL("http://localhost:"+listenPort+urldash); }
+        {   label: 'Save Flow As',
+            click() { saveFlow(); }
         },
-        { label: 'Editor',
-        accelerator: "Shift+CmdOrCtrl+E",
-        click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
+        {   type: 'separator' },
+        {   label: 'Console',
+            accelerator: "Shift+CmdOrCtrl+C",
+            click() { createConsole(); }
         },
-        { label: 'Worldmap',
-        accelerator: "Shift+CmdOrCtrl+M",
-        click() { mainWindow.loadURL("http://localhost:"+listenPort+urlmap); }
+        {   label: 'Dashboard',
+            accelerator: "Shift+CmdOrCtrl+D",
+            click() { mainWindow.loadURL("http://localhost:"+listenPort+urldash); }
         },
-        { type: 'separator' },
-        { label: 'Documentation',
-        click() { electron.shell.openExternal('https://nodered.org/docs') }
+        {   label: 'Editor',
+            accelerator: "Shift+CmdOrCtrl+E",
+            click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
         },
-        { label: 'Flows and Nodes',
-        click() { electron.shell.openExternal('https://flows.nodered.org') }
+        {   label: 'Worldmap',
+            accelerator: "Shift+CmdOrCtrl+M",
+            click() { mainWindow.loadURL("http://localhost:"+listenPort+urlmap); }
         },
-        { label: 'Discourse Forum',
-        click() { electron.shell.openExternal('https://discourse.nodered.org/') }
+        {   type: 'separator' },
+        {   label: 'Documentation',
+            click() { electron.shell.openExternal('https://nodered.org/docs') }
         },
-        { type: "separator" },
-        { role: 'quit' }
-    ]}, {
-    // label: "Edit",
+        {   label: 'Flows and Nodes',
+            click() { electron.shell.openExternal('https://flows.nodered.org') }
+        },
+        {   label: 'Discourse Forum',
+            click() { electron.shell.openExternal('https://discourse.nodered.org/') }
+        },
+        {   type: "separator" },
+        {   role: 'togglefullscreen' },
+        {   role: 'quit' }
+    ]}
+    // ,{label: "Edit",
     // submenu: [
     //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
     //     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
@@ -150,38 +169,76 @@ var template = [{
     //     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
     //     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
     //     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    // ]}, {
-    label: 'View',
-    submenu: [
-        { label: 'Reload',
-            accelerator: 'CmdOrCtrl+R',
-            click(item, focusedWindow) { if (focusedWindow) { focusedWindow.reload(); }}
-        },
-        { label: 'Toggle Developer Tools',
-            accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-            click(item, focusedWindow) { if (focusedWindow) { focusedWindow.webContents.toggleDevTools(); }}
-        },
-        { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' },
-        { role: 'minimize' }
-    ]}
+    // ]}
+    // ,{ label: 'View',
+    // submenu: [
+    //     {   label: 'Reload',
+    //         accelerator: 'CmdOrCtrl+R',
+    //         click(item, focusedWindow) { if (focusedWindow) { focusedWindow.reload(); }}
+    //     },
+    //     {   label: 'Toggle Developer Tools',
+    //         accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+    //         click(item, focusedWindow) { if (focusedWindow) { focusedWindow.webContents.toggleDevTools(); }}
+    //     },
+    //     {   type: 'separator' },
+    //     {   role: 'resetzoom' },
+    //     {   role: 'zoomin' },
+    //     {   role: 'zoomout' },
+    //     {   type: 'separator' },
+    //     {   role: 'togglefullscreen' },
+    //     {   role: 'minimize' }
+    // ]}
 ];
 
-// function openFlow() {
-//     dialog.showOpenDialog(function (fileNames) {
-//         if (fileNames === undefined) {
-//             console.log("No file selected");
-//         }
-//         else {
-//             console.log(fileNames[0]);
-//             //readFile(fileNames[0]);
-//         }
-//     });
-// }
+if (!showMap) { template[0].submenu.splice(6,1); }
+
+if (!editable) {
+    template[0].submenu.splice(3,1);
+    template[0].submenu.splice(4,1);
+}
+
+if (!allowLoadSave) { template[0].submenu.splice(0,2); }
+
+let fileName = ""
+function saveFlow() {
+    dialog.showSaveDialog({
+        filters:[{ name:'JSON', extensions:['json'] }],
+        defaultPath: fileName
+    }, function(file_path) {
+        if (file_path) {
+            var flo = JSON.stringify(RED.nodes.getFlows());
+            fs.writeFile(file_path, flo, function(err) {
+                if (err) { dialog.showErrorBox('Error', err); }
+                else { dialog.showErrorBox('OK', "Flow file saved as\n\n"+file_path); }
+            });
+        }
+    });
+}
+
+function openFlow() {
+    dialog.showOpenDialog({ filters:[{ name:'JSON', extensions:['json']} ]},
+        function (fileNames) {
+            if (fileNames) {
+                //console.log(fileNames[0]);
+                fs.readFile(fileNames[0], 'utf-8', function (err, data) {
+                    try {
+                        var flo = JSON.parse(data);
+                        if (Array.isArray(flo) && (flo.length > 0)) {
+                            RED.nodes.setFlows(flo,"full");
+                            fileName = fileNames[0];
+                        }
+                        else {
+                            dialog.showErrorBox("Error", "Failed to parse flow file.\n\n  "+fileNames[0]+".\n\nAre you sure it's a flow file ?");
+                        }
+                    }
+                    catch(e) {
+                        dialog.showErrorBox("Error", "Failed to load flow file.\n\n  "+fileNames[0]);
+                    }
+                });
+            }
+        }
+    )
+}
 
 // Create the console log window
 function createConsole() {
@@ -193,7 +250,6 @@ function createConsole() {
         height: 600,
         icon: path.join(__dirname, 'nodered.png')
     });
-    //conWindow.loadURL("http://localhost:"+listenPort+urlconsole);
     conWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'console.htm'),
         protocol: 'file:',
@@ -250,7 +306,10 @@ function createWindow() {
         mainWindow = null;
     });
 
-    // Open the DevTools.
+    // Start the app full screen
+    //mainWindow.setFullScreen(true)
+
+    // Open the DevTools at start
     //mainWindow.webContents.openDevTools();
 }
 
@@ -273,7 +332,7 @@ app.on('activate', function() {
     }
 });
 
-// Start the Node-RED runtime, then load the inital page
+// Start the Node-RED runtime, then load the inital dashboard page
 RED.start().then(function() {
     server.listen(listenPort,"127.0.0.1",function() {
         mainWindow.loadURL("http://127.0.0.1:"+listenPort+urldash);
