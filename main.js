@@ -206,10 +206,16 @@ function saveFlow() {
         defaultPath: fileName
     }, function(file_path) {
         if (file_path) {
-            var flo = JSON.stringify(RED.nodes.getFlows());
+            var flo = JSON.stringify(RED.nodes.getFlows().flows);
             fs.writeFile(file_path, flo, function(err) {
                 if (err) { dialog.showErrorBox('Error', err); }
-                else { dialog.showErrorBox('OK', "Flow file saved as\n\n"+file_path); }
+                else {
+                    dialog.showMessageBox({
+                        icon: "nodered.png",
+                        message:"Flow file saved as\n\n"+file_path,
+                        buttons: ["OK"]
+                    });
+                }
             });
         }
     });
