@@ -117,8 +117,9 @@ red_app.use(settings.httpNodeRoot,RED.httpNode);
 var template = [
     // {label: "Application",
     // submenu: [
-    //     { role: 'about' },
-    //     { type: "separator" },
+    //     //{ role: 'about' },
+    //     //{ type: "separator" },
+    //     { role: 'togglefullscreen' },
     //     { role: 'quit' }
     // ]},
     { label: 'Node-RED',
@@ -254,7 +255,8 @@ function createConsole() {
         title: "Node-RED Console",
         width: 800,
         height: 600,
-        icon: path.join(__dirname, 'nodered.png')
+        icon: path.join(__dirname, 'nodered.png'),
+        autoHideMenuBar: true
     });
     conWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'console.htm'),
@@ -273,17 +275,19 @@ function createConsole() {
 // Create the main browser window
 function createWindow() {
     mainWindow = new BrowserWindow({
-        autoHideMenuBar: true,
-        webPreferences: {
-            nodeIntegration: false
-        },
         title: "Node-RED",
-        fullscreenable: true,
         //titleBarStyle: "hidden",
         width: 1024,
         height: 768,
-        icon: path.join(__dirname, 'nodered.png')
+        icon: path.join(__dirname, 'nodered.png'),
+        fullscreenable: true,
+        autoHideMenuBar: true,
+        webPreferences: {
+            nodeIntegration: false
+        }
     });
+    mainWindow.loadURL(`file://${__dirname}/load.html`);
+    //if (process.platform !== 'darwin') { mainWindow.setAutoHideMenuBar(true); }
 
     mainWindow.webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
         if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+urldash))) {
