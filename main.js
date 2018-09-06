@@ -43,22 +43,45 @@ red_app.use("/",express.static("web"));
 // Create a server
 var server = http.createServer(red_app);
 
+// Setup user directory and flowfile
 var userdir = __dirname;
 if (editable) {
+    // if running as raw electron use the current directory (mainly for dev)
     if (process.argv[1] && (process.argv[1] === "main.js")) {
         userdir = __dirname;
+        if ((process.argv.length > 2) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
+            if (path.isAbsolute(process.argv[process.argv.length-1])) {
+                flowfile = process.argv[process.argv.length-1];
+            }
+            else {
+                flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
+            }
+        }
     }
     else { // We set the user directory to be in the users home directory...
         userdir = os.homedir() + '/.node-red';
         if (!fs.existsSync(userdir)) {
             fs.mkdirSync(userdir);
         }
-        if (!fs.existsSync(userdir+"/"+flowfile)) {
-            fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+        if ((process.argv.length > 1) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
+            if (path.isAbsolute(process.argv[process.argv.length-1])) {
+                flowfile = process.argv[process.argv.length-1];
+            }
+            else {
+                flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
+            }
+        }
+        else {
+            if (!fs.existsSync(userdir+"/"+flowfile)) {
+                fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+            }
         }
     }
 }
-console.log("UserDir :",userdir);
+// console.log("CWD",process.cwd());
+// console.log("DIR",__dirname);
+// console.log("UserDir :",userdir);
+// console.log("FlowFile :",flowfile);
 // console.log("PORT",listenPort);
 
 // Keep a global reference of the window objects, if you don't, the window will
@@ -66,7 +89,7 @@ console.log("UserDir :",userdir);
 let mainWindow;
 let conWindow;
 let logBuffer = [];
-let logLength = 250;
+let logLength = 250;    // No. of lines of console log to keep.
 
 ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
 
@@ -200,7 +223,7 @@ if (!editable) {
 
 if (!allowLoadSave) { template[0].submenu.splice(0,2); }
 
-let fileName = ""
+let fileName = "";
 function saveFlow() {
     dialog.showSaveDialog({
         filters:[{ name:'JSON', extensions:['json'] }],
