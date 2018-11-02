@@ -1,6 +1,6 @@
 {
     "name": "electron_node_red",
-    "version": "0.19.4",
+    "version": "0.19.5",
     "description": "Electron Node-RED application starter",
     "main": "main.js",
     "scripts": {
@@ -31,8 +31,8 @@
         "express": "^4.16.4",
         "node-red": "*",
         "node-red-contrib-play-audio": "*",
-        "node-red-contrib-web-worldmap": "~1.5.6",
-        "node-red-dashboard": "~2.10.0",
+        "node-red-contrib-web-worldmap": "*",
+        "node-red-dashboard": "*",
         "node-red-node-base64": "*",
         "node-red-node-geofence": "*",
         "node-red-node-random": "*",
@@ -57,7 +57,7 @@
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron": "~2.0.12",
+        "electron": "~2.0.13",
         "electron-rebuild": "~1.7.3",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"
