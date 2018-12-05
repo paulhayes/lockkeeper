@@ -147,10 +147,14 @@ var template = [
     // ]},
     { label: 'Node-RED',
     submenu: [
+        {   type: 'separator' },
+        {   type: 'separator' },
         {   label: 'Import Flow',
+            accelerator: "Shift+CmdOrCtrl+O",
             click() { openFlow(); }
         },
         {   label: 'Save Flow As',
+            accelerator: "Shift+CmdOrCtrl+S",
             click() { saveFlow(); }
         },
         {   type: 'separator' },
