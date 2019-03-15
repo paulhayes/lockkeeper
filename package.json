@@ -1,6 +1,6 @@
 {
     "name": "electron_node_red",
-    "version": "0.20.0",
+    "version": "0.20.1",
     "description": "Electron Node-RED application starter",
     "main": "main.js",
     "scripts": {
