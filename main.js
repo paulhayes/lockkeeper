@@ -75,6 +75,10 @@ if (editable) {
             if (!fs.existsSync(userdir+"/"+flowfile)) {
                 fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
             }
+            let credFile = flowfile.replace(".json","_cred.json");
+            if (fs.existsSync(__dirname+"/"+credFile) && !fs.existsSync(userdir+"/"+credFile)) {
+                fs.writeFileSync(userdir+"/"+credFile, fs.readFileSync(__dirname+"/"+credFile));
+            }
         }
     }
 }
