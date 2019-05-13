@@ -29,10 +29,10 @@
     },
     "dependencies": {
         "express": "^4.16.4",
-        "node-red": "~0.20.5",
+        "node-red": "*",
         "node-red-contrib-play-audio": "*",
-        "node-red-contrib-web-worldmap": "~1.5.37",
-        "node-red-dashboard": "~2.14.0",
+        "node-red-contrib-web-worldmap": "~2.0.8",
+        "node-red-dashboard": "~2.15.0",
         "node-red-node-base64": "*",
         "node-red-node-geofence": "*",
         "node-red-node-random": "*",
