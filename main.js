@@ -15,6 +15,10 @@ const urlmap = "/worldmap";         // url for the worldmap
 // tcp port to use
 //const listenPort = "18880";                           // fix it if you like
 const listenPort = parseInt(Math.random()*16383+49152)  // or random ephemeral port
+const remotePort = 18880;
+const remoteHost = null;
+const host = "127.0.0.1";
+const hostUrl = "http://"+host+":";
 
 const os = require('os');
 const fs = require('fs');
@@ -30,6 +34,8 @@ const dialog = electron.dialog;
 const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
 
+app.setName("Escape Room Control");
+
 // this should be placed at top of main.js to handle squirrel setup events quickly
 if (handleSquirrelEvent()) { return; }
 
@@ -44,6 +50,8 @@ red_app.use("/",express.static("web"));
 var server = http.createServer(red_app);
 
 // Setup user directory and flowfile
+console.log( "userData path:", app.getPath('userData') );
+
 var userdir = __dirname;
 if (editable) {
     // if running as raw electron use the current directory (mainly for dev)
@@ -97,13 +105,15 @@ let logLength = 250;    // No. of lines of console log to keep.
 
 ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
 
+
+
 // Create the settings object - see default settings.js file for other options
 var settings = {
     httpAdminRoot: "/red",  // set to false to disable editor/deploy
     httpNodeRoot: "/",
     userDir: userdir,
     flowFile: flowfile,
-    editorTheme: { projects:{ enabled:false } },
+    editorTheme: { projects:{ enabled:true } },
     functionGlobalContext: { },    // enables global context
     logging: {
         websock: {
@@ -149,7 +159,7 @@ var template = [
     //     { role: 'togglefullscreen' },
     //     { role: 'quit' }
     // ]},
-    { label: 'Node-RED',
+    { label: "Menu",
     submenu: [
         {   type: 'separator' },
         {   type: 'separator' },
@@ -306,7 +316,7 @@ function createConsole() {
 // Create the main browser window
 function createWindow() {
     mainWindow = new BrowserWindow({
-        title: "Node-RED",
+        title: app.getName(),
         //titleBarStyle: "hidden",
         width: 1024,
         height: 768,
@@ -352,6 +362,7 @@ function createWindow() {
 
     // Open the DevTools at start
     //mainWindow.webContents.openDevTools();
+
 }
 
 // Called when Electron has finished initialization and is ready to create browser windows.
@@ -361,7 +372,10 @@ app.on('ready', createWindow );
 app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') { app.quit(); }
+    if (process.platform !== 'darwin') { 
+        
+        app.quit(); 
+    }
 });
 
 app.on('activate', function() {
@@ -369,14 +383,14 @@ app.on('activate', function() {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
-        mainWindow.loadURL("http://127.0.0.1:"+listenPort+urldash);
+        mainWindow.loadURL(hostUrl+listenPort+urldash);
     }
 });
 
 // Start the Node-RED runtime, then load the inital dashboard page
 RED.start().then(function() {
-    server.listen(listenPort,"127.0.0.1",function() {
-        mainWindow.loadURL("http://127.0.0.1:"+listenPort+urldash);
+    server.listen(listenPort,host,function() {
+        mainWindow.loadURL(hostUrl+listenPort+urldash);
     });
 });
 
@@ -435,5 +449,29 @@ function handleSquirrelEvent() {
 
         app.quit();
         return true;
+    }
+}
+
+let remoteAccessForward;
+
+function startRemoteAccess(){
+    if(remoteAccessForward)
+        return;
+
+        remoteAccessForward = net.createServer(function(from) {
+        var to = net.createConnection({
+            host: host,
+            port: post
+        });
+        from.pipe(to);
+        to.pipe(from);
+    }).listen(remotePort, remoteHost);
+}
+
+function stopRemoteAccess(){
+    if(remoteAccessForward){
+        remoteAccessForward.close(function(){
+            remoteAccessForward = null;
+        });
     }
 }

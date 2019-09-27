@@ -1,7 +1,8 @@
 {
-    "name": "electron_node_red",
+    "name": "escape_room_control",
+    "productName":"Escape Room Control",
     "version": "0.20.8",
-    "description": "Electron Node-RED application starter",
+    "description": "Electron Node-RED for Escape Room Control Systems",
     "main": "main.js",
     "scripts": {
         "start": "electron main.js",
@@ -31,10 +32,8 @@
         "express": "~4.17.1",
         "node-red": "0.20.8",
         "node-red-contrib-play-audio": "*",
-        "node-red-contrib-web-worldmap": "*",
         "node-red-dashboard": "*",
         "node-red-node-base64": "*",
-        "node-red-node-geofence": "*",
         "node-red-node-random": "*",
         "node-red-node-serialport": "*",
         "node-red-node-smooth": "*"
@@ -45,6 +44,9 @@
         "node-red"
     ],
     "contributors": [
+        {
+            "name":"Paul Hayes"
+        },
         {
             "name": "Dave Conway-Jones"
         },

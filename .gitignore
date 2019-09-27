@@ -37,3 +37,5 @@ node_modules
 *.back
 .config.json.backup
 *.backup
+
+projects
