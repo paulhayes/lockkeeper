@@ -222,7 +222,7 @@ var template = [
     // ]}
 ];
 
-if (!showMap) { template[0].submenu.splice(6,1); }
+if (!showMap) { template[0].submenu.splice(8,1); }
 
 if (!editable) {
     template[0].submenu.splice(3,1);
