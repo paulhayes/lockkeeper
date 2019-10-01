@@ -121,6 +121,7 @@ var settings = {
             metrics: false,
             handler: function() {
                 return function(msg) {
+                    console.log(msg);
                     if (editable) {  // No logging if not editable
                         var ts = (new Date(msg.timestamp)).toISOString();
                         ts = ts.replace("Z"," ").replace("T"," ");
@@ -330,7 +331,7 @@ function createWindow() {
     mainWindow.loadURL(`file://${__dirname}/load.html`);
     //if (process.platform !== 'darwin') { mainWindow.setAutoHideMenuBar(true); }
 
-    mainWindow.webContents.on('did-get-response-details', function(event, status, newURL, originalURL, httpResponseCode) {
+    mainWindow.webContents.on('did-start-loading', function(event, status, newURL, originalURL, httpResponseCode) {
         if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+urldash))) {
             setTimeout(mainWindow.webContents.reload, 250);
         }

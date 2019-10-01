@@ -1,6 +1,6 @@
 {
     "name": "escape_room_control",
-    "productName":"Escape Room Control",
+    "productName": "Escape Room Control",
     "version": "1.0.0",
     "description": "Electron Node-RED for Escape Room Control Systems",
     "main": "main.js",
@@ -8,6 +8,7 @@
         "start": "electron main.js",
         "test": "echo \" Warning: no test specified \"",
         "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
+        "install": "electron-rebuild",
         "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
@@ -32,10 +33,12 @@
         "express": "~4.17.1",
         "node-red": "1.0.0",
         "node-red-contrib-play-audio": "*",
+        "node-red-contrib-usb-hid-relay": "~0.2.4",
         "node-red-dashboard": "*",
+        "node-red-node-arduino": "~0.2.2",
         "node-red-node-base64": "*",
         "node-red-node-random": "*",
-        "node-red-node-serialport": "*",
+        "node-red-node-serialport": "~0.8.8",
         "node-red-node-smooth": "*"
     },
     "keywords": [
@@ -45,7 +48,7 @@
     ],
     "contributors": [
         {
-            "name":"Paul Hayes"
+            "name": "Paul Hayes"
         },
         {
             "name": "Dave Conway-Jones"
@@ -60,8 +63,8 @@
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron": "~2.0.18",
-        "electron-rebuild": "~1.8.6",
+        "electron": "^5.0.5",
+        "electron-rebuild": "^1.8.6",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"
     }
