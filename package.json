@@ -1,7 +1,7 @@
 {
     "name": "escape_room_control",
     "productName":"Escape Room Control",
-    "version": "0.20.8",
+    "version": "1.0.0",
     "description": "Electron Node-RED for Escape Room Control Systems",
     "main": "main.js",
     "scripts": {
@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "express": "~4.17.1",
-        "node-red": "0.20.8",
+        "node-red": "1.0.0",
         "node-red-contrib-play-audio": "*",
         "node-red-dashboard": "*",
         "node-red-node-base64": "*",
