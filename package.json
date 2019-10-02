@@ -35,7 +35,7 @@
         "node-red-contrib-play-audio": "*",
         "node-red-contrib-usb-hid-relay": "~0.2.4",
         "node-red-dashboard": "*",
-        "node-red-node-arduino": "~0.2.2",
+        "node-red-node-arduino": "^0.2.2",
         "node-red-node-base64": "*",
         "node-red-node-random": "*",
         "node-red-node-serialport": "~0.8.8",
