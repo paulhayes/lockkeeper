@@ -30,16 +30,18 @@
         "url": "git+https://github.com/dceejay/electron-node-red.git"
     },
     "dependencies": {
+        "electron-store": "^5.0.0",
         "express": "~4.17.1",
         "node-red": "1.0.0",
         "node-red-contrib-play-audio": "*",
         "node-red-contrib-usb-hid-relay": "~0.2.4",
         "node-red-dashboard": "*",
-        "node-red-node-arduino": "^0.2.2",
+        "node-red-node-arduino": "file:../node-red-nodes/hardware/Arduino",
         "node-red-node-base64": "*",
         "node-red-node-random": "*",
         "node-red-node-serialport": "~0.8.8",
-        "node-red-node-smooth": "*"
+        "node-red-node-smooth": "*",
+        "serialport": "^7.1.5"
     },
     "keywords": [
         "electron",

@@ -5,12 +5,10 @@
 
 const editable = true;      // Set this to false to create a run only application - no editor/no console
 const allowLoadSave = false;        // set to true to allow omport and export of flow
-const showMap = false;              // set to true to add Worldmap to the menu
-let flowfile = 'electronflow.json'; // default Flows file name - loaded at start
+let flowfile = 'flow.json'; // default Flows file name - loaded at start
 const urldash = "/ui/#/0";          // Start on the dashboard page
 const urledit = "/red";             // url for the editor page
 const urlconsole = "/console.htm";  // url for the console page
-const urlmap = "/worldmap";         // url for the worldmap
 
 // tcp port to use
 //const listenPort = "18880";                           // fix it if you like
@@ -27,6 +25,7 @@ const path = require('path');
 const http = require('http');
 const express = require("express");
 const electron = require('electron');
+const Store = require('electron-store');
 
 const app = electron.app;
 const ipc = electron.ipcMain;
@@ -34,6 +33,10 @@ const dialog = electron.dialog;
 const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
 
+app.setPath('userData', path.join(app.getPath('appData'), "EscapeRoomControl"));
+const store = new Store();
+
+//Set the user data path to use the local
 app.setName("Escape Room Control");
 
 // this should be placed at top of main.js to handle squirrel setup events quickly
@@ -50,12 +53,10 @@ red_app.use("/",express.static("web"));
 var server = http.createServer(red_app);
 
 // Setup user directory and flowfile
-console.log( "userData path:", app.getPath('userData') );
-
 var userdir = __dirname;
 if (editable) {
     // if running as raw electron use the current directory (mainly for dev)
-    if (process.argv[1] && (process.argv[1] === "main.js")) {
+    if (process.argv[1] && (process.argv[1] === "main.js") && !store.has("project_dir")) {
         userdir = __dirname;
         if ((process.argv.length > 2) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
             if (path.isAbsolute(process.argv[process.argv.length-1])) {
@@ -67,7 +68,11 @@ if (editable) {
         }
     }
     else { // We set the user directory to be in the users home directory...
-        userdir = os.homedir() + '/.node-red';
+        
+
+        userdir = store.get('project_dir',os.homedir() + '/.node-red');
+        console.log(userdir);
+
         if (!fs.existsSync(userdir)) {
             fs.mkdirSync(userdir);
         }
@@ -80,13 +85,7 @@ if (editable) {
             }
         }
         else {
-            if (!fs.existsSync(userdir+"/"+flowfile)) {
-                fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
-            }
-            let credFile = flowfile.replace(".json","_cred.json");
-            if (fs.existsSync(__dirname+"/"+credFile) && !fs.existsSync(userdir+"/"+credFile)) {
-                fs.writeFileSync(userdir+"/"+credFile, fs.readFileSync(__dirname+"/"+credFile));
-            }
+            setupProject(userdir);
         }
     }
 }
@@ -113,6 +112,7 @@ var settings = {
     httpNodeRoot: "/",
     userDir: userdir,
     flowFile: flowfile,
+    flowFilePretty: true,
     editorTheme: { projects:{ enabled:true } },
     functionGlobalContext: { },    // enables global context
     logging: {
@@ -164,13 +164,18 @@ var template = [
     submenu: [
         {   type: 'separator' },
         {   type: 'separator' },
-        {   label: 'Import Flow',
+/*        {   label: 'Import Flow',
             accelerator: "Shift+CmdOrCtrl+O",
             click() { openFlow(); }
         },
         {   label: 'Save Flow As',
             accelerator: "Shift+CmdOrCtrl+S",
             click() { saveFlow(); }
+        },
+        */
+        {
+            label: "Open Project", 
+            click(){ openProject(); }            
         },
         {   type: 'separator' },
         {   label: 'Console',
@@ -184,10 +189,6 @@ var template = [
         {   label: 'Editor',
             accelerator: "Shift+CmdOrCtrl+E",
             click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
-        },
-        {   label: 'Worldmap',
-            accelerator: "Shift+CmdOrCtrl+M",
-            click() { mainWindow.loadURL("http://localhost:"+listenPort+urlmap); }
         },
         {   type: 'separator' },
         {   label: 'Documentation',
@@ -233,8 +234,6 @@ var template = [
     // ]}
 ];
 
-if (!showMap) { template[0].submenu.splice(8,1); }
-
 if (!editable) {
     template[0].submenu.splice(3,1);
     template[0].submenu.splice(4,1);
@@ -262,6 +261,48 @@ function saveFlow() {
             });
         }
     });
+}
+
+/*function saveProject(){
+    Node.
+}*/
+
+function openProject(){
+    dialog.showOpenDialog({ 
+        title: "Open Project",
+        buttonLabel:"Open",
+        defaultPath:settings.userDir,
+        properties:['openDirectory'] },function(folder){
+        if( folder === undefined ){
+            return;
+        }
+        if( folder instanceof Array ){
+            console.log("folder was array");
+            folder = folder[0];
+        }
+        setupProject(folder);
+        RED.stop();
+        settings.userDir = folder;
+        store.set('project_dir',folder);
+        restart();
+    });
+}
+
+function restart(){
+    //spawn new instance of app, and close this one
+    //this is esencially a restart
+    require('child_process').spawn(process.execPath,process.argv.slice(1),{ detached : true });
+    app.quit();
+}
+
+function setupProject(userdir){
+    if (!fs.existsSync(userdir+"/"+flowfile)) {
+        fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+    }
+    let credFile = flowfile.replace(".json","_cred.json");
+    if (fs.existsSync(__dirname+"/"+credFile) && !fs.existsSync(userdir+"/"+credFile)) {
+        fs.writeFileSync(userdir+"/"+credFile, fs.readFileSync(__dirname+"/"+credFile));
+    }
 }
 
 function openFlow() {
