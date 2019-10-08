@@ -9,7 +9,7 @@
         "test": "echo \" Warning: no test specified \"",
         "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
         "install": "electron-rebuild",
-        "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
+        "clean": "rm -rf .\\build ..\\electron-bin && mkdir .\\build ..\\electron-bin",
         "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
         "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp after*.sh build/Node-RED-linux-ia32/",
@@ -32,14 +32,14 @@
     "dependencies": {
         "electron-store": "^5.0.0",
         "express": "~4.17.1",
-        "node-red": "1.0.0",
+        "node-red": "^1.0.1",
         "node-red-contrib-play-audio": "*",
         "node-red-contrib-usb-hid-relay": "~0.2.4",
-        "node-red-dashboard": "*",
+        "node-red-dashboard": "^2.17.0",
         "node-red-node-arduino": "file:../node-red-nodes/hardware/Arduino",
         "node-red-node-base64": "*",
         "node-red-node-random": "*",
-        "node-red-node-serialport": "~0.8.8",
+        "node-red-node-serialport": "^0.8.8",
         "node-red-node-smooth": "*",
         "serialport": "^7.1.5"
     },
@@ -65,8 +65,7 @@
     },
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
-        "electron": "^5.0.5",
-        "electron-rebuild": "^1.8.6",
+        "electron": "^6.0.11",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"
     }
