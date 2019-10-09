@@ -277,7 +277,9 @@ function openProject(){
             return;
         }
         if( folder instanceof Array ){
-            console.log("folder was array");
+            if(folder.length==0){
+                return;
+            }
             folder = folder[0];
         }
         setupProject(folder);
