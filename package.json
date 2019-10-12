@@ -1,6 +1,6 @@
 {
     "name": "escape_room_control",
-    "productName": "Escape Room Control",
+    "productName": "Lockkeeper",
     "version": "1.0.0",
     "description": "Electron Node-RED for Escape Room Control Systems",
     "main": "main.js",
@@ -9,8 +9,7 @@
         "test": "echo \" Warning: no test specified \"",
         "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
         "install": "electron-rebuild",
-        "clean": "rm -rf .\\build ..\\electron-bin && mkdir .\\build ..\\electron-bin",
-        "pack": "npm run clean && electron-packager . Node-RED --icon=nodered.icns --all --out=build --overwrite",
+        "clean": "rm -rf .\\build && rm -rf ..\\electron-bin && mkdir .\\build ..\\electron-bin",
         "pack:osx": "electron-packager . Node-RED --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
         "pack:linux32": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp after*.sh build/Node-RED-linux-ia32/",
         "pack:linux64": "electron-packager . Node-RED --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite && cp after*.sh build/Node-RED-linux-x64",
@@ -23,7 +22,16 @@
         "build:linux64": "npm run pack:linux64 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a x86_64 -p ../electron-bin -C build/Node-RED-linux-x64  --prefix=/opt/node-red --after-install=afterinst.sh --after-remove=afterremove.sh ./",
         "build:win32": "npm run pack:win32 && node makewin32.js",
         "build:win64": "npm run pack:win64 && node makewin64.js",
-        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a armv7l -p ../electron-bin -C build/Node-RED-linux-armv7l --prefix=/opt/node-red --after-install=afterinst.sh ./"
+        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m conway@uk.ibm.com -a armv7l -p ../electron-bin -C build/Node-RED-linux-armv7l --prefix=/opt/node-red --after-install=afterinst.sh ./",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder",
+        "postinstall": "electron-builder install-app-deps"
+    },
+    "build": {
+        "appId": "lockkeeper",
+        "mac": {
+            "category": "your.app.category.type"
+        }
     },
     "repository": {
         "type": "git",
@@ -36,7 +44,7 @@
         "node-red-contrib-midi": "git+https://github.com/paulhayes/node-red-contrib-midi.git",
         "node-red-contrib-osc": "^1.1.0",
         "node-red-contrib-play-audio": "*",
-        "node-red-contrib-usb-hid-relay": "~0.2.4",
+        "node-red-contrib-usb-hid-relay": "^0.2.4",
         "node-red-dashboard": "^2.17.0",
         "node-red-node-arduino": "file:../node-red-nodes/hardware/Arduino",
         "node-red-node-base64": "*",
@@ -68,6 +76,7 @@
     "homepage": "https://github.com/dceejay/electron-node-red#readme",
     "devDependencies": {
         "electron": "^6.0.12",
+        "electron-builder": "^21.2.0",
         "electron-rebuild": "^1.8.6",
         "electron-squirrel-startup": "*",
         "electron-winstaller": "2.5.2"
