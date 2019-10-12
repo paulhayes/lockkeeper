@@ -33,6 +33,8 @@
         "electron-store": "^5.0.0",
         "express": "~4.17.1",
         "node-red": "^1.0.1",
+        "node-red-contrib-midi": "git+https://github.com/paulhayes/node-red-contrib-midi.git",
+        "node-red-contrib-osc": "^1.1.0",
         "node-red-contrib-play-audio": "*",
         "node-red-contrib-usb-hid-relay": "~0.2.4",
         "node-red-dashboard": "^2.17.0",
