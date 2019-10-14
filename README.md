@@ -7,7 +7,7 @@ Lockkeeper is an open source ( GPL v3.0 License )[License.md] application intend
 
 Welcome ERIC 2019 Workshop participants. The Flow for the workshop control panel is availble here https://raw.githubusercontent.com/paulhayes/escape-room-template-node-red-project/eric2019workshop/flow.json
 
-Source code for the Control Panel's Microcontrollers can be found at https://github.com/paulhayes/eric2019-workshop
+Source code for the Control Panel's Microcontrollers are available as [Platformio](https://platformio.org/) projects: https://github.com/paulhayes/eric2019-workshop
 
 It's features include 
 * Dashboard
