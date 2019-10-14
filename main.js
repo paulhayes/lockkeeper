@@ -9,7 +9,7 @@ let flowfile = 'flow.json'; // default Flows file name - loaded at start
 const urldash = "/ui/#/0";          // Start on the dashboard page
 const urledit = "/red";             // url for the editor page
 const urlconsole = "/console.htm";  // url for the console page
-
+const appName = "Lockkeeper";
 // tcp port to use
 //const listenPort = "18880";                           // fix it if you like
 const listenPort = parseInt(Math.random()*16383+49152)  // or random ephemeral port
@@ -33,11 +33,11 @@ const dialog = electron.dialog;
 const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
 
-app.setPath('userData', path.join(app.getPath('appData'), "EscapeRoomControl"));
+app.setPath('userData', path.join(app.getPath('appData'), appName));
 const store = new Store();
 
 //Set the user data path to use the local
-app.setName("Escape Room Control");
+app.setName(appName);
 
 // this should be placed at top of main.js to handle squirrel setup events quickly
 if (handleSquirrelEvent()) { return; }
@@ -164,15 +164,6 @@ var template = [
     submenu: [
         {   type: 'separator' },
         {   type: 'separator' },
-/*        {   label: 'Import Flow',
-            accelerator: "Shift+CmdOrCtrl+O",
-            click() { openFlow(); }
-        },
-        {   label: 'Save Flow As',
-            accelerator: "Shift+CmdOrCtrl+S",
-            click() { saveFlow(); }
-        },
-        */
         {
             label: "Open Project", 
             click(){ openProject(); }            
@@ -203,7 +194,18 @@ var template = [
         {   type: "separator" },
         {   role: 'togglefullscreen' },
         {   role: 'quit' }
-    ]}
+    ]},
+    {
+      label: "Edit",
+      submenu: [
+          { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+          { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+          { type: "separator" },
+          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+      ]}
     // ,{label: "Edit",
     // submenu: [
     //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
