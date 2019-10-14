@@ -56,7 +56,7 @@ var server = http.createServer(red_app);
 var userdir = __dirname;
 if (editable) {
     // if running as raw electron use the current directory (mainly for dev)
-    if (process.argv[1] && (process.argv[1] === "main.js") && !store.has("project_dir")) {
+    /*if (process.argv[1] && (process.argv[1] === "main.js") && !store.has("project_dir")) {
         userdir = __dirname;
         if ((process.argv.length > 2) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
             if (path.isAbsolute(process.argv[process.argv.length-1])) {
@@ -67,10 +67,11 @@ if (editable) {
             }
         }
     }
-    else { // We set the user directory to be in the users home directory...
+    else {*/ 
+      // We set the user directory to be in the users home directory...
         
-
-        userdir = store.get('project_dir',os.homedir() + '/.node-red');
+        let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
+        userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : os.homedir() + '/.node-red');
         console.log(userdir);
 
         if (!fs.existsSync(userdir)) {
@@ -87,7 +88,7 @@ if (editable) {
         else {
             setupProject(userdir);
         }
-    }
+    //}
 }
 // console.log("CWD",process.cwd());
 // console.log("DIR",__dirname);
