@@ -5,6 +5,10 @@
 
 Lockkeeper is an open source ( GPL v3.0 License )[License.md] application intended to provide Escape Room creators and easy to use off the shelf tool for developing, controlling and deploying their projects.
 
+Welcome ERIC 2019 Workshop participants. The Flow for the workshop control panel is availble here https://raw.githubusercontent.com/paulhayes/escape-room-template-node-red-project/eric2019workshop/flow.json
+
+Source code for the Control Panel's Microcontrollers can be found at https://github.com/paulhayes/eric2019-workshop
+
 It's features include 
 * Dashboard
 * Timer
