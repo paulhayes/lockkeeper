@@ -55,40 +55,28 @@ var server = http.createServer(red_app);
 // Setup user directory and flowfile
 var userdir = __dirname;
 if (editable) {
-    // if running as raw electron use the current directory (mainly for dev)
-    /*if (process.argv[1] && (process.argv[1] === "main.js") && !store.has("project_dir")) {
-        userdir = __dirname;
-        if ((process.argv.length > 2) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
-            if (path.isAbsolute(process.argv[process.argv.length-1])) {
-                flowfile = process.argv[process.argv.length-1];
-            }
-            else {
-                flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
-            }
-        }
-    }
-    else {*/ 
-      // We set the user directory to be in the users home directory...
-        
-        let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
-        userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : os.homedir() + '/.node-red');
-        console.log(userdir);
+    
+    // We set the user directory to be in the users home directory...
+    
+    let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
+    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : os.homedir() + '/lockkeeper');
+    console.log(userdir);
 
-        if (!fs.existsSync(userdir)) {
-            fs.mkdirSync(userdir);
-        }
-        if ((process.argv.length > 1) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
-            if (path.isAbsolute(process.argv[process.argv.length-1])) {
-                flowfile = process.argv[process.argv.length-1];
-            }
-            else {
-                flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
-            }
+    if (!fs.existsSync(userdir)) {
+        fs.mkdirSync(userdir);
+    }
+    if ((process.argv.length > 1) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
+        if (path.isAbsolute(process.argv[process.argv.length-1])) {
+            flowfile = process.argv[process.argv.length-1];
         }
         else {
-            setupProject(userdir);
+            flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
         }
-    //}
+    }
+    else {
+        setupProject(userdir);
+    }
+
 }
 // console.log("CWD",process.cwd());
 // console.log("DIR",__dirname);
@@ -163,7 +151,6 @@ var template = [
     // ]},
     { label: "Menu",
     submenu: [
-        {   type: 'separator' },
         {   type: 'separator' },
         {
             label: "Open Project", 
