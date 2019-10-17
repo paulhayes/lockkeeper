@@ -33,6 +33,7 @@ const BrowserWindow = electron.BrowserWindow;
 const {Menu, MenuItem} = electron;
 
 app.setPath('userData', path.join(app.getPath('appData'), appName));
+
 const store = new Store();
 
 //Set the user data path to use the local
@@ -58,9 +59,8 @@ if (editable) {
     // We set the user directory to be in the users home directory...
     
     let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
-    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : path.join( os.homedir() + 'lockkeeper' ));
-    console.log(userdir);
-
+    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : path.join( os.homedir(), 'lockkeeper' ));
+    
     if (!fs.existsSync(userdir)) {
         fs.mkdirSync(userdir);
     }
