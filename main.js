@@ -4,7 +4,6 @@
 // Some settings you can edit easily
 
 const editable = true;      // Set this to false to create a run only application - no editor/no console
-const allowLoadSave = false;        // set to true to allow omport and export of flow
 let flowfile = 'flow.json'; // default Flows file name - loaded at start
 const urldash = "/ui/#/0";          // Start on the dashboard page
 const urledit = "/red";             // url for the editor page
@@ -59,7 +58,7 @@ if (editable) {
     // We set the user directory to be in the users home directory...
     
     let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
-    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : os.homedir() + '/lockkeeper');
+    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : path.join( os.homedir() + 'lockkeeper' ));
     console.log(userdir);
 
     if (!fs.existsSync(userdir)) {
@@ -228,8 +227,6 @@ if (!editable) {
     template[0].submenu.splice(3,1);
     template[0].submenu.splice(4,1);
 }
-
-if (!allowLoadSave) { template[0].submenu.splice(0,2); }
 
 let fileName = "";
 function saveFlow() {
