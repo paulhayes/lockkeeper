@@ -41,11 +41,11 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-git clone https://github.com/dceejay/electron-node-red.git
+git clone https://github.com/paulhayes/lockkeeper.git
 # Go into the repository
-cd electron-node-red
+cd lockkeeper
 # Install dependencies and run the app
-npm install && npm run clean && npm start
+npm install && npm start
 ```
 
 ## Packaging your application
