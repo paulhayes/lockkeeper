@@ -1,0 +1,72 @@
+{
+    "name": "lockkeeper",
+    "productName": "Lockkeeper",
+    "author": "Paul Hayes",
+    "version": "2.0.8",
+    "description": "Electron Node-RED for Escape Room Control Systems",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron main.js",
+        "profile": "electron --inspect main.js",
+        "test": "echo \" Warning: no test specified \"",
+        "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder",
+        "postinstall": "electron-builder install-app-deps"
+    },
+    "build": {
+        "appId": "lockkeeper",
+        "mac": {
+            "category": "your.app.category.type"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dceejay/electron-node-red.git"
+    },
+    "dependencies": {
+        "electron-store": "^5.0.0",
+        "express": "~4.17.1",
+        "node-red": "^1.0.2",
+        "node-red-contrib-midi": "git+https://github.com/paulhayes/node-red-contrib-midi.git",
+        "node-red-contrib-osc": "^1.1.0",
+        "node-red-contrib-play-audio": "*",
+        "node-red-contrib-say": "~0.1.1",
+        "node-red-contrib-usb-hid-relay": "^0.2.5",
+        "node-red-dashboard": "^2.17.1",
+        "node-red-node-arduino": "^0.2.2",
+        "node-red-node-base64": "*",
+        "node-red-node-random": "*",
+        "node-red-node-serialport": "^0.8.8",
+        "node-red-node-smooth": "*",
+        "serialport": "^7.1.5"
+    },
+    "keywords": [
+        "electron",
+        "quick start",
+        "node-red"
+    ],
+    "contributors": [
+        {
+            "name": "Paul Hayes"
+        },
+        {
+            "name": "Dave Conway-Jones"
+        },
+        {
+            "name": "Nathanaël Lécaudé"
+        }
+    ],
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/dceejay/electron-node-red/issues"
+    },
+    "homepage": "https://github.com/dceejay/electron-node-red#readme",
+    "devDependencies": {
+        "electron": "^6.0.12",
+        "electron-builder": "^21.2.0",
+        "electron-rebuild": "^1.8.6",
+        "electron-squirrel-startup": "*",
+        "electron-winstaller": "2.5.2"
+    }
+}
