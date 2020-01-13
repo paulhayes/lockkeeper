@@ -93,7 +93,7 @@ let logLength = 250;    // No. of lines of console log to keep.
 ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
 
 
-
+process.chdir(userdir);
 // Create the settings object - see default settings.js file for other options
 var settings = {
     httpAdminRoot: "/red",  // set to false to disable editor/deploy
