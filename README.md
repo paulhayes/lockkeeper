@@ -1,7 +1,7 @@
 ![](img/LockkeeperTitleBlack.png)
 ![](img/LockkeeperBlack.png)
 
-Lockkeeper is an open source [GPL v3.0 License](License.md) application intended to provide Escape Room creators and easy to use off the shelf tool for developing, controlling and deploying their projects.
+Lockkeeper is an open source [GPL v3.0 License](License.md) application intended to provide Escape Room creators an easy to use off the shelf tool for developing, controlling and deploying escape room control systems.
 
 It's features include 
 * Dashboard
@@ -16,7 +16,12 @@ Download a latest release from the releases page. Please note, this project is a
 
 But if you want to play along, please join us, feature suggestions are welcome on the Issues page.
 
-## Getting Started 
+### Importing the default template
+Open Lockkeeper, press Alt ( on Windows ) to show the menu bar, select File->Editor.
+Then in the Editor window, go to the menu button on the top right ( the horizontal lines ), go down to Import, and paste the contents of the following file:
+https://raw.githubusercontent.com/paulhayes/lockkeeper-escape-room-template/master/flows.json
+
+## Advanced Start
 
 If you'd like support for node-red packages, you'll need to install nodejs. This is so Lockkeeper can use npm ( node package manager ).
 
@@ -24,6 +29,9 @@ If you'd like to version control your project, please install [git]().
 
 Node RED will detect when these are available and enable the extra features in the node RED menu ( top right ).
 
+### Opening the default template project
+Fork the following repository and then clone that from the node-RED projects dialog.
+git@github.com:paulhayes/lockkeeper-escape-room-template.git
 
 ## Building yourself
 
@@ -33,22 +41,12 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-git clone https://github.com/dceejay/electron-node-red.git
+git clone https://github.com/paulhayes/lockkeeper.git
 # Go into the repository
-cd electron-node-red
+cd lockkeeper
 # Install dependencies and run the app
-npm install && npm run clean && npm start
+npm install && npm start
 ```
-
-## TL:DR - building runtimes
-
-On OSX you can run `./buildall` to build binaries of "everything"... maybe...
-
-Run `npm run pack` to create packages for all platforms - these are the files required to run, they are not binary installers.
-
-Builds are created in the `build` directory. Runtimes are created in the `../electron-bin` directory.
-
-**Note**: this was written to work on a Mac... other tools may/will be needed on other platforms.
 
 ## Packaging your application
 
@@ -59,7 +57,3 @@ npm run dist
 ```
 
 ## License [GPLv3](LICENSE.md)
-
-## See also
- - **Stand-alone Starter Project** - https://github.com/dceejay/node-red-project-starter
- - **Bluemix Starter Project** - https://github.com/dceejay/node-red-bluemix-starter

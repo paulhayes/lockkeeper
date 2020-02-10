@@ -93,7 +93,7 @@ let logLength = 250;    // No. of lines of console log to keep.
 ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
 
 
-
+process.chdir(userdir);
 // Create the settings object - see default settings.js file for other options
 var settings = {
     httpAdminRoot: "/red",  // set to false to disable editor/deploy
@@ -421,7 +421,7 @@ app.on('activate', function() {
 // Start the Node-RED runtime, then load the inital dashboard page
 RED.start().then(function() {
     server.listen(listenPort,host,function() {
-        mainWindow.loadURL(hostUrl+listenPort+urldash);
+        mainWindow.loadURL(hostUrl+listenPort+urldash);       
     });
 });
 
