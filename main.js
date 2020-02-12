@@ -4,7 +4,7 @@
 // Some settings you can edit easily
 
 const editable = true;      // Set this to false to create a run only application - no editor/no console
-let flowfile = 'flow.json'; // default Flows file name - loaded at start
+let flowfile = 'flows.json'; // default Flows file name - loaded at start
 const urldash = "/ui/#/0";          // Start on the dashboard page
 const urledit = "/red";             // url for the editor page
 const urlconsole = "/console.htm";  // url for the console page
@@ -22,9 +22,12 @@ const fs = require('fs');
 const url = require('url');
 const path = require('path');
 const http = require('http');
+const https = require('https');
+const fstream = require('fstream');
 const express = require("express");
 const electron = require('electron');
 const Store = require('electron-store');
+const unzipper = require('unzipper');
 const nodeRedDefaultSettings = require('./node_modules/node-red/settings');
 
 const app = electron.app;
@@ -57,10 +60,12 @@ var server = http.createServer(red_app);
 var userdir = __dirname;
 if (editable) {
     
-    // We set the user directory to be in the users home directory...
     
-    let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
-    userdir = store.get('project_dir',isRunningUnbuilt ? __dirname : path.join( os.homedir(), 'lockkeeper' ));
+    //let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
+    //isRunningUnbuilt ? __dirname : 
+
+    // By default we set the user directory to be 'lockkeeper' in the users home directory...
+    userdir = store.get('project_dir',path.join( os.homedir(), 'lockkeeper' ));
     
     if (!fs.existsSync(userdir)) {
         fs.mkdirSync(userdir);
@@ -93,7 +98,6 @@ let logLength = 250;    // No. of lines of console log to keep.
 
 ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
 
-
 process.chdir(userdir);
 // Create the settings object - see default settings.js file for other options
 var settings = {
@@ -102,7 +106,7 @@ var settings = {
     userDir: userdir,
     flowFile: flowfile,
     flowFilePretty: true,
-    editorTheme: { projects:{ enabled:true } },
+    editorTheme: { projects:{ enabled:false } },
     functionGlobalContext: { },    // enables global context
     logging: {
         websock: {
@@ -156,8 +160,12 @@ var template = [
     submenu: [
         {   type: 'separator' },
         {
+            label: "New Project",
+            click(){ newProjectDialog(); }
+        },
+        {
             label: "Open Project", 
-            click(){ openProject(); }            
+            click(){ openProjectDialog(); }            
         },
         {   type: 'separator' },
         {   label: 'Console',
@@ -258,43 +266,132 @@ function saveFlow() {
     Node.
 }*/
 
-function openProject(){
-    dialog.showOpenDialog({ 
+async function newProjectDialog(){
+    
+    let saveResponse = await dialog.showSaveDialog({
+        title:"New Project Directory"
+    }).catch(function(err){});
+    if( saveResponse === undefined || saveResponse.canceled ){
+        return;
+    }        
+    let folder = saveResponse.filePath;
+    
+    
+    try{
+        let pathExists = fs.existsSync(folder);
+        if( pathExists ){
+            dialog.showErrorBox("Error Creating New Project","project location already exists");
+            return;
+        }
+    }
+    catch(e) {
+        console.error(e);
+        return;
+    }
+    
+    newProject(folder);
+    
+ 
+    
+}
+
+async function openProjectDialog(){
+    
+    let folder = await dialog.showOpenDialog({ 
         title: "Open Project",
         buttonLabel:"Open",
         defaultPath:settings.userDir,
-        properties:['openDirectory'] },function(folder){
-        if( folder === undefined ){
+        properties:['openDirectory'] }).catch(function(err){});
+     
+    if( folder === undefined || folder.canceled ){
+        return;
+    }
+    console.log(folder);
+    folder = folder.filePaths;
+    
+    if( folder instanceof Array ){
+        if(folder.length==0){
             return;
         }
-        if( folder instanceof Array ){
-            if(folder.length==0){
-                return;
-            }
-            folder = folder[0];
+        folder = folder[0];
+    }
+    
+    openProject(folder);
+}
+
+async function newProject(folder){
+        
+    let onZipError = function(err){
+        dialog.showErrorBox("Error Creating New Project","unable to download template, check network connection\n"+err.toString());
+    }
+    let loadZipResponse = async function(response){
+        
+        if(response.statusCode==302){
+            console.log(`redirected to ${response.headers.location}`);
+            https.get(response.headers.location,loadZipResponse).on('error',onZipError);
+            return;
         }
-        setupProject(folder);
-        RED.stop();
-        settings.userDir = folder;
-        store.set('project_dir',folder);
-        restart();
-    });
+        if(!fs.existsSync(folder)){
+            console.log("new project folder ",folder);
+            try{
+                await fs.promises.mkdir(folder);
+            }
+            catch(e){
+                dialog.showErrorBox("Error Creating New Project",`Failed to create project folder ${folder}\n ${e}`);
+            }
+        }
+        
+        response.pipe(unzipper.Extract({path:folder, getWriter: function(options){
+            //write
+            options.path = options.path.replace('lockkeeper-escape-room-template-master'+path.sep,'');
+            console.log(options);
+            return fstream.Writer(options);
+        }}).on('end',function(){
+            console.log("extract complete");
+            
+        }).on('error',function(e){
+            console.error(e);
+        }).on('finish',function(){
+            console.log('extract finished');
+            openProject(folder);    
+        }));
+    }
+    https.get("https://github.com/paulhayes/lockkeeper-escape-room-template/archive/master.zip",loadZipResponse).on('error',onZipError);
+}
+
+function openProject(folder){
+    if(!isProjectFolder(folder)){
+        dialog.showErrorBox("Error Opening Project",`the selected folder,\n${folder}\nis not a valid project folder`);
+        return;
+    }
+    //setupProject(folder);
+    RED.stop();
+    settings.userDir = folder;
+    store.set('project_dir',folder);
+    restart();
+}
+
+function isProjectFolder(folder){
+    let flowPath = path.join(folder,flowfile);
+    let credFilePath = flowfile.replace(".json","_cred.json");
+    return fs.existsSync(flowPath);
 }
 
 function restart(){
+    process.chdir(__dirname);
     //spawn new instance of app, and close this one
     //this is esencially a restart
-    require('child_process').spawn(process.execPath,process.argv.slice(1),{ detached : true });
+    require('child_process').spawn(process.execPath,process.argv.slice(1),{ detached : true, stdio:[0,1,2] });
     app.quit();
 }
 
 function setupProject(userdir){
-    if (!fs.existsSync(userdir+"/"+flowfile)) {
-        fs.writeFileSync(userdir+"/"+flowfile, fs.readFileSync(__dirname+"/"+flowfile));
+    if (!fs.existsSync(path.join(userdir,flowfile))) {
+        fs.writeFileSync(path.join(userdir,flowfile), fs.readFileSync(path.join(__dirname,flowfile)));
     }
     let credFile = flowfile.replace(".json","_cred.json");
-    if (fs.existsSync(__dirname+"/"+credFile) && !fs.existsSync(userdir+"/"+credFile)) {
-        fs.writeFileSync(userdir+"/"+credFile, fs.readFileSync(__dirname+"/"+credFile));
+    if (fs.existsSync(path.join(__dirname,credFile)) && !fs.existsSync(path.join(userdir,credFile))) {
+        fs.writeFileSync(path.join(userdir,credFile), fs.readFileSync(path.join(__dirname,credFile)));
     }
 }
 
