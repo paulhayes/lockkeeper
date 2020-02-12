@@ -25,6 +25,7 @@ const http = require('http');
 const express = require("express");
 const electron = require('electron');
 const Store = require('electron-store');
+const nodeRedDefaultSettings = require('./node_modules/node-red/settings');
 
 const app = electron.app;
 const ipc = electron.ipcMain;
@@ -123,6 +124,9 @@ var settings = {
         }
     }
 };
+
+settings = Object.assign(nodeRedDefaultSettings,settings);
+
 if (!editable) {
     settings.httpAdminRoot = false;
     settings.readOnly = true;
