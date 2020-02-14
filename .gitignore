@@ -41,3 +41,5 @@ node_modules
 *.backup
 
 projects
+
+.DS_Store

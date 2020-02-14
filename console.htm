@@ -7,10 +7,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1, minimum-scale=1">
     </head>
     <body style="margin:0;" onload="scrollDown()" >
-        <font style="font-family:'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:9pt;">
+        <div style="font-family:'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:9pt;">
         <div id="header" style="background-color:#910000; position:fixed; height:16px; width:100%; padding:8px;"><input type="button" value="Clear Log" onclick="clearList()";/></div>
         <div id="debug" style="padding:4px; padding-left:8px; padding-top:34px;"></div>
-        </font>
+        </div>
         <script>
             const logLength = 250;
             const { ipcRenderer } = require('electron');

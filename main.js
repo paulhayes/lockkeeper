@@ -3,11 +3,9 @@
 
 // Some settings you can edit easily
 
-const editable = true;      // Set this to false to create a run only application - no editor/no console
 let flowfile = 'flows.json'; // default Flows file name - loaded at start
 const urldash = "/ui/#/0";          // Start on the dashboard page
 const urledit = "/red";             // url for the editor page
-const urlconsole = "/console.htm";  // url for the console page
 const appName = "Lockkeeper";
 // tcp port to use
 //const listenPort = "18880";                           // fix it if you like
@@ -17,24 +15,28 @@ const remoteHost = null;
 const host = "127.0.0.1";
 const hostUrl = "http://"+host+":";
 
+// node js core
 const os = require('os');
 const fs = require('fs');
-const url = require('url');
 const path = require('path');
 const http = require('http');
-const https = require('https');
-const fstream = require('fstream');
+const url = require('url');
+
+// 3rd party dependancies
 const express = require("express");
 const electron = require('electron');
 const Store = require('electron-store');
-const unzipper = require('unzipper');
-const nodeRedDefaultSettings = require('./node_modules/node-red/settings');
 
-const app = electron.app;
-const ipc = electron.ipcMain;
-const dialog = electron.dialog;
+// app src
+const menu = require('./src/menu');
+const Settings = require('./settings');
+const logging = require('./src/logging');
+const projects = require('./src/projects');
+
 const BrowserWindow = electron.BrowserWindow;
-const {Menu, MenuItem} = electron;
+const app = electron.app;
+const urlNoProject = '/no-project.html';
+const mainFilePath = __filename;
 
 app.setPath('userData', path.join(app.getPath('appData'), appName));
 
@@ -46,8 +48,11 @@ app.setName(appName);
 // this should be placed at top of main.js to handle squirrel setup events quickly
 if (handleSquirrelEvent()) { return; }
 
-var RED = require("node-red");
-var red_app = express();
+let RED = require("node-red");
+let red_app = express();
+// Keep a global reference of the window objects, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindow;
 
 // Add a simple route for static content served from 'public'
 red_app.use("/",express.static("web"));
@@ -56,397 +61,48 @@ red_app.use("/",express.static("web"));
 // Create a server
 var server = http.createServer(red_app);
 
+
 // Setup user directory and flowfile
 var userdir = __dirname;
-if (editable) {
-    
-    
-    //let isRunningUnbuilt = (process.argv[1] && (process.argv[1] === "main.js"));
-    //isRunningUnbuilt ? __dirname : 
 
-    // By default we set the user directory to be 'lockkeeper' in the users home directory...
-    userdir = store.get('project_dir',path.join( os.homedir(), 'lockkeeper' ));
-    
-    if (!fs.existsSync(userdir)) {
-        fs.mkdirSync(userdir);
-    }
-    if ((process.argv.length > 1) && (process.argv[process.argv.length-1].indexOf(".json") > -1)) {
-        if (path.isAbsolute(process.argv[process.argv.length-1])) {
-            flowfile = process.argv[process.argv.length-1];
-        }
-        else {
-            flowfile = path.join(process.cwd(),process.argv[process.argv.length-1]);
-        }
-    }
-    else {
-        setupProject(userdir);
-    }
+// By default we set the user directory to be 'lockkeeper' in the users home directory...
+userdir = store.get('project_dir',null);
 
-}
+     
 // console.log("CWD",process.cwd());
 // console.log("DIR",__dirname);
 // console.log("UserDir :",userdir);
 // console.log("FlowFile :",flowfile);
 // console.log("PORT",listenPort);
 
-// Keep a global reference of the window objects, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
-let conWindow;
-let logBuffer = [];
-let logLength = 250;    // No. of lines of console log to keep.
+const settings = Settings(userdir);
+settings.userDir = userdir;
+settings.flowFile = flowfile;
 
-ipc.on('clearLogBuffer', function(event, arg) { logBuffer = []; });
+logging.init(settings);
+projects.init(settings,app,store,mainFilePath);
 
-process.chdir(userdir);
-// Create the settings object - see default settings.js file for other options
-var settings = {
-    httpAdminRoot: "/red",  // set to false to disable editor/deploy
-    httpNodeRoot: "/",
-    userDir: userdir,
-    flowFile: flowfile,
-    flowFilePretty: true,
-    editorTheme: { projects:{ enabled:false } },
-    functionGlobalContext: { },    // enables global context
-    logging: {
-        websock: {
-            level: 'info',
-            metrics: false,
-            handler: function() {
-                return function(msg) {
-                    console.log(msg);
-                    if (editable) {  // No logging if not editable
-                        var ts = (new Date(msg.timestamp)).toISOString();
-                        ts = ts.replace("Z"," ").replace("T"," ");
-                        var line = ts+" : "+msg.msg;
-                        logBuffer.push(line);
-                        if (conWindow) { conWindow.webContents.send('debugMsg', line); }
-                        if (logBuffer.length > logLength) { logBuffer.shift(); }
-                    }
-                }
-            }
-        }
-    }
-};
 
-settings = Object.assign(nodeRedDefaultSettings,settings);
+if( userdir!==null ){
+  // Change current working directory to project dir
+  process.chdir(userdir);
+  // Initialise the runtime with a server and settings
+  RED.init(server,settings);
 
-if (!editable) {
-    settings.httpAdminRoot = false;
-    settings.readOnly = true;
- }
-
-// Initialise the runtime with a server and settings
-RED.init(server,settings);
-
-// Serve the editor UI from /red
-if (settings.httpAdminRoot !== false) {
+  // Serve the editor UI from /red
+  if (settings.httpAdminRoot !== false) {
     red_app.use(settings.httpAdminRoot,RED.httpAdmin);
+  }
+
+  // Serve the http nodes UI from /
+  red_app.use(settings.httpNodeRoot,RED.httpNode);
 }
 
-// Serve the http nodes UI from /
-red_app.use(settings.httpNodeRoot,RED.httpNode);
 
-// Create the Application's main menu
-var template = [
-    // {label: "Application",
-    // submenu: [
-    //     //{ role: 'about' },
-    //     //{ type: "separator" },
-    //     { role: 'togglefullscreen' },
-    //     { role: 'quit' }
-    // ]},
-    { label: "Menu",
-    submenu: [
-        {   type: 'separator' },
-        {
-            label: "New Project",
-            click(){ newProjectDialog(); }
-        },
-        {
-            label: "Open Project", 
-            click(){ openProjectDialog(); }            
-        },
-        {   type: 'separator' },
-        {   label: 'Console',
-            accelerator: "Shift+CmdOrCtrl+C",
-            click() { createConsole(); }
-        },
-        {   label: 'Dashboard',
-            accelerator: "Shift+CmdOrCtrl+D",
-            click() { mainWindow.loadURL("http://localhost:"+listenPort+urldash); }
-        },
-        {   label: 'Editor',
-            accelerator: "Shift+CmdOrCtrl+E",
-            click() { mainWindow.loadURL("http://localhost:"+listenPort+urledit); }
-        },
-        {   type: 'separator' },
-        {   label: 'Documentation',
-            click() { electron.shell.openExternal('https://nodered.org/docs') }
-        },
-        {   label: 'Flows and Nodes',
-            click() { electron.shell.openExternal('https://flows.nodered.org') }
-        },
-        {   label: 'Discourse Forum',
-            click() { electron.shell.openExternal('https://discourse.nodered.org/') }
-        },
-        {   type: "separator" },
-        {   role: 'togglefullscreen' },
-        {   role: 'quit' }
-    ]},
-    {
-      label: "Edit",
-      submenu: [
-          { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-          { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-          { type: "separator" },
-          { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-          { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-      ]}
-    // ,{label: "Edit",
-    // submenu: [
-    //     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-    //     { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-    //     { type: "separator" },
-    //     { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-    //     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-    //     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-    //     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    // ]}
-    // ,{ label: 'View',
-    // submenu: [
-    //     {   label: 'Reload',
-    //         accelerator: 'CmdOrCtrl+R',
-    //         click(item, focusedWindow) { if (focusedWindow) { focusedWindow.reload(); }}
-    //     },
-    //     {   label: 'Toggle Developer Tools',
-    //         accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-    //         click(item, focusedWindow) { if (focusedWindow) { focusedWindow.webContents.toggleDevTools(); }}
-    //     },
-    //     {   type: 'separator' },
-    //     {   role: 'resetzoom' },
-    //     {   role: 'zoomin' },
-    //     {   role: 'zoomout' },
-    //     {   type: 'separator' },
-    //     {   role: 'togglefullscreen' },
-    //     {   role: 'minimize' }
-    // ]}
-];
-
-if (!editable) {
-    template[0].submenu.splice(3,1);
-    template[0].submenu.splice(4,1);
-}
-
-let fileName = "";
-function saveFlow() {
-    dialog.showSaveDialog({
-        filters:[{ name:'JSON', extensions:['json'] }],
-        defaultPath: fileName
-    }, function(file_path) {
-        if (file_path) {
-            var flo = JSON.stringify(RED.nodes.getFlows().flows);
-            fs.writeFile(file_path, flo, function(err) {
-                if (err) { dialog.showErrorBox('Error', err); }
-                else {
-                    dialog.showMessageBox({
-                        icon: "nodered.png",
-                        message:"Flow file saved as\n\n"+file_path,
-                        buttons: ["OK"]
-                    });
-                }
-            });
-        }
-    });
-}
-
-/*function saveProject(){
-    Node.
-}*/
-
-async function newProjectDialog(){
-    
-    let saveResponse = await dialog.showSaveDialog({
-        title:"New Project Directory"
-    }).catch(function(err){});
-    if( saveResponse === undefined || saveResponse.canceled ){
-        return;
-    }        
-    let folder = saveResponse.filePath;
-    
-    
-    try{
-        let pathExists = fs.existsSync(folder);
-        if( pathExists ){
-            dialog.showErrorBox("Error Creating New Project","project location already exists");
-            return;
-        }
-    }
-    catch(e) {
-        console.error(e);
-        return;
-    }
-    
-    newProject(folder);
-    
- 
-    
-}
-
-async function openProjectDialog(){
-    
-    let folder = await dialog.showOpenDialog({ 
-        title: "Open Project",
-        buttonLabel:"Open",
-        defaultPath:settings.userDir,
-        properties:['openDirectory'] }).catch(function(err){});
-     
-    if( folder === undefined || folder.canceled ){
-        return;
-    }
-    console.log(folder);
-    folder = folder.filePaths;
-    
-    if( folder instanceof Array ){
-        if(folder.length==0){
-            return;
-        }
-        folder = folder[0];
-    }
-    
-    openProject(folder);
-}
-
-async function newProject(folder){
-        
-    let onZipError = function(err){
-        dialog.showErrorBox("Error Creating New Project","unable to download template, check network connection\n"+err.toString());
-    }
-    let loadZipResponse = async function(response){
-        
-        if(response.statusCode==302){
-            console.log(`redirected to ${response.headers.location}`);
-            https.get(response.headers.location,loadZipResponse).on('error',onZipError);
-            return;
-        }
-        if(!fs.existsSync(folder)){
-            console.log("new project folder ",folder);
-            try{
-                await fs.promises.mkdir(folder);
-            }
-            catch(e){
-                dialog.showErrorBox("Error Creating New Project",`Failed to create project folder ${folder}\n ${e}`);
-            }
-        }
-        
-        response.pipe(unzipper.Extract({path:folder, getWriter: function(options){
-            //write
-            options.path = options.path.replace('lockkeeper-escape-room-template-master'+path.sep,'');
-            console.log(options);
-            return fstream.Writer(options);
-        }}).on('end',function(){
-            console.log("extract complete");
-            
-        }).on('error',function(e){
-            console.error(e);
-        }).on('finish',function(){
-            console.log('extract finished');
-            openProject(folder);    
-        }));
-    }
-    https.get("https://github.com/paulhayes/lockkeeper-escape-room-template/archive/master.zip",loadZipResponse).on('error',onZipError);
-}
-
-function openProject(folder){
-    if(!isProjectFolder(folder)){
-        dialog.showErrorBox("Error Opening Project",`the selected folder,\n${folder}\nis not a valid project folder`);
-        return;
-    }
-    //setupProject(folder);
-    RED.stop();
-    settings.userDir = folder;
-    store.set('project_dir',folder);
-    restart();
-}
-
-function isProjectFolder(folder){
-    let flowPath = path.join(folder,flowfile);
-    let credFilePath = flowfile.replace(".json","_cred.json");
-    return fs.existsSync(flowPath);
-}
-
-function restart(){
-    process.chdir(__dirname);
-    //spawn new instance of app, and close this one
-    //this is esencially a restart
-    require('child_process').spawn(process.execPath,process.argv.slice(1),{ detached : true, stdio:[0,1,2] });
-    app.quit();
-}
-
-function setupProject(userdir){
-    if (!fs.existsSync(path.join(userdir,flowfile))) {
-        fs.writeFileSync(path.join(userdir,flowfile), fs.readFileSync(path.join(__dirname,flowfile)));
-    }
-    let credFile = flowfile.replace(".json","_cred.json");
-    if (fs.existsSync(path.join(__dirname,credFile)) && !fs.existsSync(path.join(userdir,credFile))) {
-        fs.writeFileSync(path.join(userdir,credFile), fs.readFileSync(path.join(__dirname,credFile)));
-    }
-}
-
-function openFlow() {
-    dialog.showOpenDialog({ filters:[{ name:'JSON', extensions:['json']} ]},
-        function (fileNames) {
-            if (fileNames) {
-                //console.log(fileNames[0]);
-                fs.readFile(fileNames[0], 'utf-8', function (err, data) {
-                    try {
-                        var flo = JSON.parse(data);
-                        if (Array.isArray(flo) && (flo.length > 0)) {
-                            RED.nodes.setFlows(flo,"full");
-                            fileName = fileNames[0];
-                        }
-                        else {
-                            dialog.showErrorBox("Error", "Failed to parse flow file.\n\n  "+fileNames[0]+".\n\nAre you sure it's a flow file ?");
-                        }
-                    }
-                    catch(e) {
-                        dialog.showErrorBox("Error", "Failed to load flow file.\n\n  "+fileNames[0]);
-                    }
-                });
-            }
-        }
-    )
-}
-
-// Create the console log window
-function createConsole() {
-    if (conWindow) { conWindow.show(); return; }
-    // Create the hidden console window
-    conWindow = new BrowserWindow({
-        title: "Node-RED Console",
-        width: 800,
-        height: 600,
-        icon: path.join(__dirname, 'nodered.png'),
-        autoHideMenuBar: true
-    });
-    conWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'console.htm'),
-        protocol: 'file:',
-        slashes: true
-    }))
-    conWindow.webContents.on('did-finish-load', () => {
-        conWindow.webContents.send('logBuff', logBuffer);
-    });
-    conWindow.on('closed', () => {
-        conWindow = null;
-    });
-    //conWindow.webContents.openDevTools();
-}
 
 // Create the main browser window
 function createWindow() {
+    let hasProject = userdir!==null;
     mainWindow = new BrowserWindow({
         title: app.getName(),
         //titleBarStyle: "hidden",
@@ -456,17 +112,32 @@ function createWindow() {
         fullscreenable: true,
         autoHideMenuBar: true,
         webPreferences: {
-            nodeIntegration: false
+            nodeIntegration: !hasProject
         }
     });
     mainWindow.loadURL(`file://${__dirname}/load.html`);
+    mainWindow.gotoDashboard = function(){
+      mainWindow.loadURL("http://localhost:"+listenPort+urldash);
+    }
+
+    mainWindow.gotoEditor = function(){
+      mainWindow.loadURL("http://localhost:"+listenPort+urledit);
+    }
+
+    mainWindow.noProjectDialog = function(){
+      mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, urlNoProject),
+        protocol: 'file:',
+        slashes: true
+      }));
+    }
     //if (process.platform !== 'darwin') { mainWindow.setAutoHideMenuBar(true); }
 
     mainWindow.webContents.on('did-start-loading', function(event, status, newURL, originalURL, httpResponseCode) {
         if ((httpResponseCode == 404) && (newURL == ("http://localhost:"+listenPort+urldash))) {
             setTimeout(mainWindow.webContents.reload, 250);
         }
-        Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+        menu.init(mainWindow,logging,projects);
     });
 
     // mainWindow.webContents.on('did-finish-load', () => {
@@ -493,7 +164,20 @@ function createWindow() {
     //mainWindow.setFullScreen(true)
 
     // Open the DevTools at start
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+
+    if(!hasProject){
+      server.listen(listenPort,host,function(){
+        mainWindow.noProjectDialog();
+      });
+    } else {
+      // Start the Node-RED runtime, then load the inital dashboard page
+      RED.start().then(function() {
+        server.listen(listenPort,host,function() {
+            mainWindow.loadURL(hostUrl+listenPort+urldash);       
+        });
+      });
+    }
 
 }
 
@@ -515,16 +199,10 @@ app.on('activate', function() {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
-        mainWindow.loadURL(hostUrl+listenPort+urldash);
+        //mainWindow.loadURL(hostUrl+listenPort+urldash);
     }
 });
 
-// Start the Node-RED runtime, then load the inital dashboard page
-RED.start().then(function() {
-    server.listen(listenPort,host,function() {
-        mainWindow.loadURL(hostUrl+listenPort+urldash);       
-    });
-});
 
 ///////////////////////////////////////////////////////
 // All this Squirrel stuff is for the Windows installer
@@ -581,29 +259,5 @@ function handleSquirrelEvent() {
 
         app.quit();
         return true;
-    }
-}
-
-let remoteAccessForward;
-
-function startRemoteAccess(){
-    if(remoteAccessForward)
-        return;
-
-        remoteAccessForward = net.createServer(function(from) {
-        var to = net.createConnection({
-            host: host,
-            port: post
-        });
-        from.pipe(to);
-        to.pipe(from);
-    }).listen(remotePort, remoteHost);
-}
-
-function stopRemoteAccess(){
-    if(remoteAccessForward){
-        remoteAccessForward.close(function(){
-            remoteAccessForward = null;
-        });
     }
 }

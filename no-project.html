@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to Lockkeeper</title>
+    <style>
+      #container {
+        width:600px;
+        margin:0 auto;
+        text-align: center;
+      }
+      button {
+        width:200px;
+        height:200px;
+        margin:25px 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <button id="new-project-btn">
+        New Project
+      </button>
+      <button id="open-project-btn">
+        Open Project
+      </button>    
+    </div>
+    <script>
+      const logLength = 250;
+      const ipc = require('electron').ipcRenderer;
+      const newProjectBtn = document.getElementById('new-project-btn');
+      const openProjectBtn = document.getElementById('open-project-btn');
+      newProjectBtn.addEventListener('click', ipc.send.bind(ipc,'newProjectDialog'));
+      openProjectBtn.addEventListener('click', ipc.send.bind(ipc,'openProjectDialog'));
+      
+    </script>
+  
+  </body>
+</html>
