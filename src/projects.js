@@ -139,11 +139,12 @@ function isProjectFolder(folder){
 }
 
 function restart(){
-  process.chdir(__dirname);
+  process.chdir(path.dirname(process.mainModule.filename));
   //spawn new instance of app, and close this one
   //this is esencially a restart
-  //TOFIX CURRENTLY WRONG DIR
-  require('child_process').spawn(process.execPath,[mainFilePath],{ detached : true, stdio:[0,1,2] });
+  //require('child_process').spawn(process.execPath,[mainFilePath],{ detached : true, stdio:[0,1,2] });
+  app.relaunch()
+
   app.quit();
 }
 

@@ -26,9 +26,7 @@ const Settings = function(projectDir){
     if('node-red' in projectSettings && typeof(projectSettings['node-red']['settings'])==='object'){
       settings = Object.assign(settings,projectSettings['node-red']['settings']);
     }
-    console.log("PROJECT SETTINGS");
-    console.log(projectSettings);
-    console.log(settings);
+    
   }
 
 
