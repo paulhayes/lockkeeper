@@ -164,7 +164,7 @@ function createWindow() {
     //mainWindow.setFullScreen(true)
 
     // Open the DevTools at start
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     if(!hasProject){
       server.listen(listenPort,host,function(){
