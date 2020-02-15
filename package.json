@@ -2,7 +2,7 @@
     "name": "lockkeeper",
     "productName": "Lockkeeper",
     "author": "Paul Hayes",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "description": "Electron Node-RED for Escape Room Control Systems",
     "main": "main.js",
     "scripts": {

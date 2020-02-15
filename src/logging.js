@@ -1,6 +1,8 @@
+const url = require('url');
+const path = require('path');
+
 // 3rd party dependancies
 const electron = require('electron');
-const url = require('url');
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 
